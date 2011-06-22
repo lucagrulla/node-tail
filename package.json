@@ -1,0 +1,25 @@
+{
+  "name": "tail",
+  "version": "0.1.0",
+  "description": "Tail of a file in node",
+  "main": "tail",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:forward/node-tail.git"
+  },
+  "engines": {
+    "node": ">=0.4.8"
+  },
+  "contributors": [
+    "Luca Grulla <luca.grulla@gmail.com>",
+    "Andy Kent",
+    "Tom Hall"
+  ],
+  "scripts": {
+    "preinstall": "node-waf clean || true; node-waf configure build"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "author": "",
+  "homepage": "https://github.com/forward/node-tail"
+}
