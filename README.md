@@ -19,5 +19,9 @@ tail.on("data", function(data) {
 
 Tail accepts the line separator as second parameter. If nothing is passed it is defaulted to new line '\n'.
 
+```javascript
+
 var lineSeparator= "-";
+
 new Tail("fileToTail",lineSeparator)
+```
