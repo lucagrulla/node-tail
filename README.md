@@ -25,3 +25,9 @@ var lineSeparator= "-";
 
 new Tail("fileToTail",lineSeparator)
 ```
+
+#Want to fork ?
+
+Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
+
+The Cakefile generates the javascript that is then published to npm.
