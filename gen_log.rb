@@ -13,7 +13,7 @@ def log_it
   File.open('test1','w+') do |f|
     file_handler = f
     while @log 
-      f.write "Luca --> #{@i} #{Time.now.to_s}, }\n"
+      f.write " #{@i} #{Time.now.to_s}, }\n"
       f.flush
       @i+=1
       sleep 0.5
