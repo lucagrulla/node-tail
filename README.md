@@ -1,0 +1,23 @@
+#tail
+
+To install:
+
+```bash
+npm install tail
+```
+
+#Use:
+```javascript
+Tail = require('tail').Tail;
+
+tail = new Tail("fileToTail");
+
+tail.on("data", function(data) {
+  console.log(data);
+});
+````
+
+Tail accepts the line separator as second parameter. If nothing is passed it is defaulted to new line '\n'.
+
+var lineSeparator= "-";
+new Tail("fileToTail",lineSeparator)
