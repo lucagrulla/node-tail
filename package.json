@@ -11,15 +11,12 @@
     "node": ">=0.4.8"
   },
   "contributors": [
-    "Luca Grulla <luca.grulla@gmail.com>",
+    "Luca Grulla",
+    "Tom Hall".
     "Andy Kent",
-    "Tom Hall"
   ],
-  "scripts": {
-    "preinstall": "node-waf clean || true; node-waf configure build"
-  },
   "dependencies": {},
   "devDependencies": {},
-  "author": "",
+  "author": "Luca Grulla",
   "homepage": "https://github.com/forward/node-tail"
 }
