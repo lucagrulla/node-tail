@@ -1,6 +1,6 @@
 fs = require('fs')
 {exec} = require 'child_process'
-prodCoffeeOpts = " --output release --compile tail.coffee"
+prodCoffeeOpts = " --bare --output release --compile tail.coffee"
 
 task 'build', 'generate release package', (options) ->
   fs.unlink "release",->
