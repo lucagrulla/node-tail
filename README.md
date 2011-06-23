@@ -26,6 +26,29 @@ var lineSeparator= "-";
 new Tail("fileToTail",lineSeparator)
 ```
 
+Tail emits the same events of a [Readable Stream](http://nodejs.org/docs/v0.4.8/api/streams.html#readable_Stream):
+
+*data 
+```javascript
+function(data){}
+```
+*end
+```javascript
+function(){}
+```
+*error
+```javascript
+function(exception){}
+```
+*close
+```javascript
+function(){}
+```
+*fd
+```javascript
+function(fd){}
+```
+
 #Want to fork ?
 
 Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
