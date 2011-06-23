@@ -28,23 +28,23 @@ new Tail("fileToTail",lineSeparator)
 
 Tail emits the same events of a [Readable Stream](http://nodejs.org/docs/v0.4.8/api/streams.html#readable_Stream):
 
-*data 
+* data 
 ```javascript
 function(data){}
 ```
-*end
+* end
 ```javascript
 function(){}
 ```
-*error
+* error
 ```javascript
 function(exception){}
 ```
-*close
+* close
 ```javascript
 function(){}
 ```
-*fd
+* fd
 ```javascript
 function(fd){}
 ```
