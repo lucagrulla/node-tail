@@ -7,7 +7,7 @@ class Tail extends events.EventEmitter
     buffer = ''
     fs.watchFile @filename, (curr, prev) =>
       if curr.size > prev.size
-        stream = fs.createReadStream(@filename, {start:prev.size, end:curr.size, encoding:"utf-8"})
+        stream = fs.createReadStream(@filename, {start:prev.size, end:curr.size-1, encoding:"utf-8"})
         stream.on 'error',(error) =>
           @emit('error', error)
         stream.on 'end',=>
