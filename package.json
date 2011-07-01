@@ -3,14 +3,14 @@
   "contributors":["Luca Grulla", "Tom Hall", "Andy Kent"],
   "name": "tail",
   "description": "tail a file in node",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/forward/node-tail.git"
   },
   "main": "tail",
   "engines": {
-    "node": "v0.4.8"
+    "node": ""0.4 || 0.5""
   },
   "dependencies": {},
   "devDependencies": {}
