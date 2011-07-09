@@ -14,7 +14,7 @@ class Tail extends events.EventEmitter
         @emit('error', error)
       stream.on 'end',()=>
         @queue.shift()
-        console.log("#{@queue.length} queue length on end of stream at #{new Date()}") if environment is 'development'
+        #console.log("#{@queue.length} queue length on end of stream at #{new Date()}") if environment is 'development'
         @internalDispatcher.emit("next") if @queue.length >= 1
         @emit('end')
       stream.on 'close',()=>
@@ -36,7 +36,8 @@ class Tail extends events.EventEmitter
       @readBlock()
     
     fs.watchFile @filename, (curr, prev) =>
-      @queue.push({start:prev.size, end:curr.size})  
-      @internalDispatcher.emit("next") if @queue.length is 1
+      if curr.size > prev.size
+        @queue.push({start:prev.size, end:curr.size})  
+        @internalDispatcher.emit("next") if @queue.length is 1
         
 exports.Tail = Tail
