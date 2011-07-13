@@ -12,27 +12,21 @@ class Tail extends events.EventEmitter
       stream.on 'error',(error) =>
         console.log("Tail error:#{error}")
         @emit('error', error)
-      stream.on 'end',()=>
+      stream.on 'end',=>
         @queue.shift()
-        #console.log("#{@queue.length} queue length on end of stream at #{new Date()}") if environment is 'development'
         @internalDispatcher.emit("next") if @queue.length >= 1
-        @emit('end')
-      stream.on 'close',()=>
-         @emit('close')
-      stream.on 'fd',(fd)=>
-        @emit('fd', fd)
       stream.on 'data', (data) =>
         @buffer += data
         parts = @buffer.split(@separator)
         @buffer = parts.pop()
-        @emit("data", chunk) for chunk in parts
+        @emit("line", chunk) for chunk in parts
 
   constructor:(@filename, @separator='\n') ->    
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
              
-    @internalDispatcher.on 'next',()=>
+    @internalDispatcher.on 'next',=>
       @readBlock()
     
     fs.watchFile @filename, (curr, prev) =>
