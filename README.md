@@ -33,12 +33,12 @@ Tail emits two type of events:
 function(data){}
 ```
 * error
-```javascript
+```
 function(exception){}
 ```
 
 If you simply want to stop the tail:
-```javascript
+```
 tail.unwatch()
 ```
 
