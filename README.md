@@ -29,7 +29,7 @@ new Tail("fileToTail",lineSeparator)
 Tail emits two type of events:
 
 * line 
-```javascript
+```
 function(data){}
 ```
 * error
