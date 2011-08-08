@@ -37,6 +37,11 @@ function(data){}
 function(exception){}
 ```
 
+If you simply want to stop the tail:
+```javascript
+tail.unwatch()
+```
+
 #Want to fork ?
 
 Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
