@@ -1,5 +1,5 @@
 {
-  "author": "Luca Grulla",
+  "author": "Forward",
   "contributors":["Luca Grulla", "Tom Hall", "Andy Kent"],
   "name": "tail",
   "description": "tail a file in node",
