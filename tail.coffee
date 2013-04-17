@@ -22,7 +22,7 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator='\n') ->    
+  constructor:(@filename, @separator='\n', @fsWatchOptions = {}) ->    
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
@@ -30,7 +30,7 @@ class Tail extends events.EventEmitter
     @internalDispatcher.on 'next',=>
       @readBlock()
     
-    fs.watchFile @filename, (curr, prev) =>
+    fs.watchFile @filename, @fsWatchOptions, (curr, prev) =>
       if curr.size > prev.size
         @queue.push({start:prev.size, end:curr.size})  
         @internalDispatcher.emit("next") if @queue.length is 1
