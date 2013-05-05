@@ -30,13 +30,16 @@ class Tail extends events.EventEmitter
     @internalDispatcher.on 'next',=>
       @readBlock()
     
-    fs.watchFile @filename, @fsWatchOptions, (curr, prev) =>
-      if curr.size > prev.size
-        @queue.push({start:prev.size, end:curr.size})  
-        @internalDispatcher.emit("next") if @queue.length is 1
+    @watch()
     
   unwatch:->
     fs.unwatchFile @filename
     @queue = []
+
+  watch:->
+    fs.watchFile @filename, @fsWatchOptions, (curr, prev) =>
+      if curr.size > prev.size
+        @queue.push({start:prev.size, end:curr.size})
+        @internalDispatcher.emit("next") if @queue.length is 1
         
 exports.Tail = Tail
