@@ -26,6 +26,7 @@ class Tail extends events.EventEmitter
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
+    @isWatching = false
              
     @internalDispatcher.on 'next',=>
       @readBlock()
@@ -34,9 +35,12 @@ class Tail extends events.EventEmitter
     
   unwatch:->
     fs.unwatchFile @filename
+    @isWatching = false
     @queue = []
 
   watch:->
+    return if @isWatching
+    @isWatching = true
     fs.watchFile @filename, @fsWatchOptions, (curr, prev) =>
       if curr.size > prev.size
         @queue.push({start:prev.size, end:curr.size})
