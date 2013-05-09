@@ -40,9 +40,12 @@ function(exception){}
 If you simply want to stop the tail:
 
 ```javascript
-
 tail.unwatch()
+```
 
+And to start watching again:
+```javascript
+tail.watch()
 ```
 
 #Want to fork ?
