@@ -28,7 +28,9 @@ class Tail extends events.EventEmitter
     @internalDispatcher = new events.EventEmitter()
     @queue = []
     @isWatching = false
-             
+    fs.stat @filename, (err,stats) => 
+      @emit 'error', err if err
+      @pos = stats.size    
     @internalDispatcher.on 'next',=>
       @readBlock()
     
@@ -37,22 +39,23 @@ class Tail extends events.EventEmitter
   
   watch: ->
     return if @isWatching
-    @pos = 0
     @isWatching = true
     @watcher = fs.watch @filename, @fsWatchOptions, (e) =>
       if e is 'change'
-        fs.stat @filename, (e, stats) =>
+        fs.stat @filename, (err, stats) =>
+          @emit 'error', err if err
           if stats.size > @pos
             @queue.push({start: @pos, end: stats.size})
             @internalDispatcher.emit("next") if @queue.length is 1
       else if e is 'rename'
         @unwatch()
-        setTimeout(1000, => @watch())
+        setTimeout (=> @watch()), 1000
   
   unwatch: ->
     @watcher.close()
-    @iswatching = false
+    @isWatching = false
     @queue = []
+    @pos = 0
     
   watchFile:->
     return if @isWatching
