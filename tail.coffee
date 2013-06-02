@@ -18,6 +18,7 @@ class Tail extends events.EventEmitter
           @internalDispatcher.emit("next") if @queue.length >= 1
         stream.on 'data', (data) =>
           @buffer += data
+          (@pos += data.length) unless @pos is null
           parts = @buffer.split(@separator)
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
@@ -27,23 +28,44 @@ class Tail extends events.EventEmitter
     @internalDispatcher = new events.EventEmitter()
     @queue = []
     @isWatching = false
-             
+    fs.stat @filename, (err,stats) => 
+      @emit 'error', err if err
+      @pos = stats.size    
     @internalDispatcher.on 'next',=>
       @readBlock()
     
     @watch()
     
-  unwatch:->
-    fs.unwatchFile @filename
-    @isWatching = false
-    @queue = []
-
-  watch:->
+  
+  watch: ->
     return if @isWatching
     @isWatching = true
-    fs.watchFile @filename, @fsWatchOptions, (curr, prev) =>
-      if curr.size > prev.size
-        @queue.push({start:prev.size, end:curr.size})
-        @internalDispatcher.emit("next") if @queue.length is 1
+    if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
+    else fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
+  
+  watchEvent:  (e) ->
+    if e is 'change'
+      fs.stat @filename, (err, stats) =>
+        @emit 'error', err if err
+        if stats.size > @pos
+          @queue.push({start: @pos, end: stats.size})
+          @internalDispatcher.emit("next") if @queue.length is 1
+    else if e is 'rename'
+      @unwatch()
+      setTimeout (=> @watch()), 1000
+  
+  watchFileEvent: (curr, prev) ->
+    if curr.size > prev.size
+      @queue.push({start:prev.size, end:curr.size})
+      @internalDispatcher.emit("next") if @queue.length is 1
+  
+  unwatch: ->
+    if fs.watch
+      @watcher.close()
+      @pos = 0
+    else fs.unwatchFile @filename
+    @isWatching = false
+    @queue = []
+  
         
 exports.Tail = Tail
