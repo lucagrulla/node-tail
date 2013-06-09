@@ -3,7 +3,7 @@
   "contributors":["Luca Grulla", "Tom Hall", "Andy Kent"],
   "name": "tail",
   "description": "tail a file in node",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/forward/node-tail.git"
