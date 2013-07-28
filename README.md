@@ -50,3 +50,7 @@ tail.unwatch()
 Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
 
 The Cakefile generates the javascript that is then published to npm.
+
+#
+License
+MIT. Please see License file for more details.
