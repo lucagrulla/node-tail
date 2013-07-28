@@ -40,9 +40,12 @@ function(exception){}
 If you simply want to stop the tail:
 
 ```javascript
-
 tail.unwatch()
+```
 
+And to start watching again:
+```javascript
+tail.watch()
 ```
 
 #Want to fork ?
@@ -51,6 +54,5 @@ Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
 
 The Cakefile generates the javascript that is then published to npm.
 
-#
-License
+#License
 MIT. Please see License file for more details.
