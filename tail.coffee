@@ -40,19 +40,20 @@ class Tail extends events.EventEmitter
   watch: ->
     return if @isWatching
     @isWatching = true
-    if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
-    else fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
+    #if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
+    fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
   
+  #concurrency problem introduced by @pos; need to solve this before being able to use watch instead of watchFile
   watchEvent:  (e) ->
-    if e is 'change'
-      fs.stat @filename, (err, stats) =>
-        @emit 'error', err if err
-        if stats.size > @pos
-          @queue.push({start: @pos, end: stats.size})
-          @internalDispatcher.emit("next") if @queue.length is 1
-    else if e is 'rename'
-      @unwatch()
-      setTimeout (=> @watch()), 1000
+      if e is 'change'
+        fs.stat @filename, (err, stats) =>
+          @emit 'error', err if err
+          if stats.size > @pos
+            @queue.push({start: @pos, end: stats.size})
+            @internalDispatcher.emit("next") if @queue.length is 1
+      else if e is 'rename'
+        @unwatch()
+        setTimeout (=> @watch()), 1000
   
   watchFileEvent: (curr, prev) ->
     if curr.size > prev.size
@@ -60,7 +61,7 @@ class Tail extends events.EventEmitter
       @internalDispatcher.emit("next") if @queue.length is 1
   
   unwatch: ->
-    if fs.watch
+    if fs.watch && @watcher
       @watcher.close()
       @pos = 0
     else fs.unwatchFile @filename
@@ -69,3 +70,4 @@ class Tail extends events.EventEmitter
   
         
 exports.Tail = Tail
+
