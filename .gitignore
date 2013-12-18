@@ -1,1 +1,3 @@
 release
+./test/log.txt
+./node_modules/tail/
