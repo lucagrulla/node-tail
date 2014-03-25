@@ -73,7 +73,7 @@ class Tail extends events.EventEmitter
 
   checkExists: ->
     if @existsCounter > @existsMaxChecks
-      @emit 'error', 'max checks reached.'
+      @emit 'error', new TailError('Max checks reached')
       return
     fs.exists @filename, (exists) =>
       if exists
@@ -90,7 +90,12 @@ class Tail extends events.EventEmitter
         setTimeout ( => @checkExists() ), @existsInterval
 
 
-  
-        
-exports.Tail = Tail
+class TailError extends Error
 
+  constructor: (@message)->
+    self = super
+    self.name = 'TailError'
+    return self
+
+
+exports.Tail = Tail
