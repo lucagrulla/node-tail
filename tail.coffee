@@ -21,22 +21,24 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator='\n', @fsWatchOptions = {}) ->    
+  constructor:(@filename, @separator='\n', @fsWatchOptions = {}, opts = {}) ->
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
-    @isWatching = false
-    stats =  fs.statSync(@filename)
-    @pos = stats.size
     @internalDispatcher.on 'next',=>
       @readBlock()
-    
-    @watch()
-    
-  
+    @isWatching = false
+    @existsMaxChecks = opts.existsMaxChecks ||  360 # max checks when file does not exist (360 * 500 = 5 min)
+    @existsInterval  = opts.existsInterval  ||  500 # millsec between checks
+    @existsCounter   = 0                            # times already checked
+
+    @checkExists()
+
+
   watch: ->
     return if @isWatching
     @isWatching = true
+    @existsCounter = 0
     if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
     else
       fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
@@ -44,7 +46,9 @@ class Tail extends events.EventEmitter
   watchEvent:  (e) ->
     if e is 'change'
       fs.stat @filename, (err, stats) =>
-        @emit 'error', err if err
+        if err
+          @emit 'error', err
+          return
         @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
         if stats.size > @pos
           @queue.push({start: @pos, end: stats.size})
@@ -52,7 +56,7 @@ class Tail extends events.EventEmitter
           @internalDispatcher.emit("next") if @queue.length is 1
     else if e is 'rename'
       @unwatch()
-      setTimeout (=> @watch()), 1000
+      @checkExists()
   
   watchFileEvent: (curr, prev) ->
     if curr.size > prev.size
@@ -66,6 +70,22 @@ class Tail extends events.EventEmitter
     else fs.unwatchFile @filename
     @isWatching = false
     @queue = []
+
+  checkExists: ->
+    if @existsCounter > @existsMaxChecks
+      @emit 'error', 'max checks reached.'
+      return
+    fs.exists @filename, (exists) =>
+      if exists
+        fs.stat @filename, (err, stats) =>
+            setTimeout ( => @checkExists() ), @existsInterval if err
+            @pos = stats.size
+            @watch()
+      else
+        @existsCounter++
+        setTimeout ( => @checkExists() ), @existsInterval
+
+
   
         
 exports.Tail = Tail
