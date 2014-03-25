@@ -79,9 +79,11 @@ class Tail extends events.EventEmitter
       if exists
         if @existsCounter is 0
           fs.stat @filename, (err, stats) =>
-              setTimeout ( => @checkExists() ), @existsInterval if err
-              @pos = stats.size
-              @watch()
+              if err
+                setTimeout ( => @checkExists() ), @existsInterval
+              else
+                @pos = stats.size
+                @watch()
         else
           @pos = 0
           @watch()
