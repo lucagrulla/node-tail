@@ -72,18 +72,23 @@ class Tail extends events.EventEmitter
     @queue = []
 
   checkExists: ->
+    # cycle function
+    cycleCheck = () =>
+      if @existsMaxChecks >= 0 and @existsCounter > @existsMaxChecks
+        @emit 'error', new TailError('file does not exist, max checks reached')
+        return
+      setTimeout ( => @checkExists() ), @existsInterval
+
     # increase check numbers
     if @existsMaxChecks >= 0
       @existsCounter++
-      if @existsCounter > @existsMaxChecks
-        @emit 'error', new TailError('file does not exist, max checks reached')
-        return
+
     fs.exists @filename, (exists) =>
       if exists
-        if @existsCounter is 0
+        if @existsCounter is 1
           fs.stat @filename, (err, stats) =>
               if err
-                setTimeout ( => @checkExists() ), @existsInterval
+                cycleCheck()
               else
                 @pos = stats.size
                 @watch()
@@ -91,7 +96,7 @@ class Tail extends events.EventEmitter
           @pos = 0
           @watch()
       else
-        setTimeout ( => @checkExists() ), @existsInterval
+        cycleCheck()
 
 class TailError extends Error
 
