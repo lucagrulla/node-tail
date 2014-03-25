@@ -28,7 +28,7 @@ class Tail extends events.EventEmitter
     @internalDispatcher.on 'next',=>
       @readBlock()
     @isWatching = false
-    @existsMaxChecks = opts.existsMaxChecks ||  360 # max checks when file does not exist (360 * 500 = 5 min)
+    @existsMaxChecks = opts.existsMaxChecks ||    1 # max checks when file does not exist (default check once) - if existsMaxChecks < 0 check forever
     @existsInterval  = opts.existsInterval  ||  500 # millsec between checks
     @existsCounter   = 0                            # times already checked
 
@@ -72,9 +72,12 @@ class Tail extends events.EventEmitter
     @queue = []
 
   checkExists: ->
-    if @existsCounter > @existsMaxChecks
-      @emit 'error', new TailError('Max checks reached')
-      return
+    # increase check numbers
+    if @existsMaxChecks >= 0
+      @existsCounter++
+      if @existsCounter > @existsMaxChecks
+        @emit 'error', new TailError('file does not exist, max checks reached')
+        return
     fs.exists @filename, (exists) =>
       if exists
         if @existsCounter is 0
@@ -88,9 +91,7 @@ class Tail extends events.EventEmitter
           @pos = 0
           @watch()
       else
-        @existsCounter++
         setTimeout ( => @checkExists() ), @existsInterval
-
 
 class TailError extends Error
 
