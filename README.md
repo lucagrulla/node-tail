@@ -15,6 +15,10 @@ tail = new Tail("fileToTail");
 tail.on("line", function(data) {
   console.log(data);
 });
+
+tail.on("error", function(error) {
+  console.log('ERROR: ', error);
+});
 ````
 
 Tail accepts the line separator as second parameter. If nothing is passed it is defaulted to new line '\n'.
