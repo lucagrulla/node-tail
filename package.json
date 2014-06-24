@@ -13,5 +13,9 @@
     "node":">= 0.4.0"
   },
   "dependencies": {},
-  "devDependencies": {"coffee-script":"1.6.2"}
+  "devDependencies": {
+    "coffee-script":"1.6.2", 
+    "sleep":"*",
+    "commander" : "*"
+  }
 }
