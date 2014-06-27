@@ -1,6 +1,5 @@
 events= require("events")
 fs =require('fs')
-util = require 'util'
 
 environment = process.env['NODE_ENV'] || 'development'
 
@@ -130,4 +129,3 @@ class Tail extends events.EventEmitter
   
         
 exports.Tail = Tail
-exports.SeriesQueue = SeriesQueue
