@@ -1,3 +1,4 @@
+# Tail = require('../always')
 Tail = require('../tail').Tail
 assert = require('assert')
 
@@ -8,11 +9,14 @@ if not module.parent
   t = new Tail(file)
   count = 0
   t.on('line', (line) ->
+    console.log  line
     count += 1 
     line_num = parseInt(line.split(":")[0])
     assert.equal(line_num, count, "line received sequence is wrong")
 
+    # console.log "count=#{count}, total=#{total}"
     if count == total
-      t.unwatch()
+      memory = t.unwatch()
       console.log "success!"
+      console.log memory
   )

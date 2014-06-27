@@ -1,5 +1,6 @@
 events= require("events")
 fs =require('fs')
+util = require 'util'
 
 environment = process.env['NODE_ENV'] || 'development'
 
@@ -13,7 +14,7 @@ class SeriesQueue
         @lock = false ## release lock
         if @queue.length >= 1
           setImmediate(() => @next() )
-      ) 
+      )
 
   constructor:(@task) ->
     @queue = [] 
@@ -26,72 +27,106 @@ class SeriesQueue
       @next()      
     )  
 
+  clean: () ->
+    @queue = [] 
+
   length : () ->
     @queue.length
   
-  
-
 
 class Tail extends events.EventEmitter
 
-  readBlock:(block, cb)=>
-    if block.end > block.start
-      stream = fs.createReadStream(@filename, {start:block.start, end:block.end-1, encoding:"utf-8"})
-      stream.on 'error',(error) =>
-        console.log("Tail error:#{error}")
-        @emit('error', error)
-        cb()
-      stream.on 'end',=>
-        cb()
-      stream.on 'data', (data) =>
+  _readBlock:(block, cb) =>
+    fs.fstat(block.fd, (err, stat) =>
+      if err
+        return cb()
+
+      start = @bookmarks[block.fd]
+      end  = stat.size 
+      if start > end
+        start = 0
+
+      size = end - start
+      if size == 0
+        return cb()
+
+      buff = new Buffer(size) 
+      fs.read(block.fd, buff, 0, size, start, (err, bytesRead, buff) =>
+        if err 
+          @emit('error', err)
+          return cb()
+
+        @bookmarks[block.fd] += bytesRead        
+        data = buff.toString('utf-8')
         @buffer += data
         parts = @buffer.split(@separator)
         @buffer = parts.pop()
         @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator='\n', @fsWatchOptions = {}) ->    
-    @buffer = ''
-    @internalDispatcher = new events.EventEmitter()
-    @queue = new SeriesQueue(@readBlock)
-    @isWatching = false
-    stats =  fs.statSync(@filename)
-    @pos = stats.size
-    @internalDispatcher.on 'next',=>
-      @readBlock()
+        if (block.type == 'close') 
+          fs.close(block.fd);
+          delete @bookmarks[block.fd];
+
+        return cb()
+      )
+    )
+
+  _checkOpen : (start) ->
+    try 
+      fd = fs.openSync(@filename, 'r')
+      stat = fs.fstatSync(fd)
+      @current = {fd: fd, inode: stat.ino}
+      if start? and start >=0
+        @bookmarks[fd] = start
+      else
+        @bookmarks[fd] = stat.size
+    catch e
+      if e.code == 'ENOENT'  # file not exists      
+        @current = {fd: null, inode: 0}
+      else
+        throw new Error("failed to read file #{@filename}: #{e.message}") 
     
+
+  constructor:(@filename, @separator='\n', @options = {}) ->    
+    @buffer = ''
+    @queue = new SeriesQueue(@_readBlock)
+    @isWatching = false
+    @bookmarks = {}
+    @_checkOpen(@options.start)
+    @interval = @options.interval || 1000
     @watch()
     
   
   watch: ->
     return if @isWatching
     @isWatching = true
-    if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
-    else
-      fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
-  
-  watchEvent:  (e) ->
-    if e is 'change'
-      fs.stat @filename, (err, stats) =>
-        @emit 'error', err if err
-        @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
-        if stats.size > @pos
-          @queue.push({start: @pos, end: stats.size})
-          @pos = stats.size
-    else if e is 'rename'
-      @unwatch()
-      setTimeout (=> @watch()), 1000
-  
-  watchFileEvent: (curr, prev) ->
-    if curr.size > prev.size
-      @queue.push({start:prev.size, end:curr.size})
+    fs.watchFile @filename, {interval: @interval}, (curr, prev) => @_watchFileEvent curr, prev
+
+    
+  _watchFileEvent: (curr, prev) ->
+    if curr.ino != @current.inode
+      if @current.fd
+        @queue.push({type: 'close', fd: @current.fd})
+      @_checkOpen(0)
+
+    if @current.fd
+      @queue.push({type:'read', fd: @current.fd})
+
   
   unwatch: ->
-    if fs.watch && @watcher
-      @watcher.close()
-      @pos = 0
-    else fs.unwatchFile @filename
+    @queue.clean()
+    fs.unwatchFile(@filename)
     @isWatching = false
-    @queue = new SeriesQueue()
+    if @current.fd
+      memory = {inode: @current.inode, pos: @bookmarks[@current.fd]} 
+    else
+      memory = {inode: 0, pos: 0}  
+
+    for fd, pos of @bookmarks
+      fs.closeSync(parseInt(fd))
+    @bookmarks = {}
+    @current = {fd:null, inode:0}
+    return memory
   
         
 exports.Tail = Tail
