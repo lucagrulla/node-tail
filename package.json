@@ -3,7 +3,7 @@
   "contributors":["Luca Grulla", "Tom Hall", "Andy Kent"],
   "name": "tail",
   "description": "tail a file in node",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "repository": {
     "type": "git",
     "url": "git://github.com/lucagrulla/node-tail.git"
@@ -13,5 +13,5 @@
     "node":">= 0.4.0"
   },
   "dependencies": {},
-  "devDependencies": {"coffee-script":"1.6.2"}
+  "devDependencies": {"coffee-script":"1.7.1"}
 }
