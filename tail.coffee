@@ -21,7 +21,7 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator='\n', @fsWatchOptions = {}) ->    
+  constructor:(@filename, @separator='\n', @fsWatchOptions = {}) ->
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
@@ -30,17 +30,17 @@ class Tail extends events.EventEmitter
     @pos = stats.size
     @internalDispatcher.on 'next',=>
       @readBlock()
-    
+
     @watch()
-    
-  
+
+
   watch: ->
     return if @isWatching
     @isWatching = true
     if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
     else
       fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
-  
+
   watchEvent:  (e) ->
     if e is 'change'
       fs.stat @filename, (err, stats) =>
@@ -52,13 +52,13 @@ class Tail extends events.EventEmitter
           @internalDispatcher.emit("next") if @queue.length is 1
     else if e is 'rename'
       @unwatch()
-      setTimeout (=> @watch()), 1000
-  
+      @emit "error", "File #{@filename} deleted"
+
   watchFileEvent: (curr, prev) ->
     if curr.size > prev.size
       @queue.push({start:prev.size, end:curr.size})
       @internalDispatcher.emit("next") if @queue.length is 1
-  
+
   unwatch: ->
     if fs.watch && @watcher
       @watcher.close()
@@ -66,7 +66,7 @@ class Tail extends events.EventEmitter
     else fs.unwatchFile @filename
     @isWatching = false
     @queue = []
-  
-        
+
+
 exports.Tail = Tail
 
