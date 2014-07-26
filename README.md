@@ -34,7 +34,7 @@ new Tail("fileToTail",lineSeparator)
 ```
 
 ##Options
-Tail allows further configuration with a third, optional object parameter. This parameter allows you to configure the underlying `fs.watch` / `fs.watchFile` methods.
+Tail allows further configuration with a third, optional object parameter. This parameter allows you to configure the underlying `fs.watch` / `fs.watchFile` methods and their behaviour.
 
 **Currently supported options:**
 - **persistent: true** (fs.watch, fs.watchFile) <br> indicates whether the process should continue to run as long as files are being watched
