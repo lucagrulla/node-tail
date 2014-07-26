@@ -42,7 +42,7 @@ class Tail extends events.EventEmitter
       fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
 
   watchEvent:  (e) ->
-    if e is 'change'
+    if e is 'change' or @fsWatchOptions.ignoreRename
       stats = fs.statSync(@filename)
       @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
       if stats.size > @pos
