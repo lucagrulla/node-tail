@@ -21,16 +21,19 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator='\n', @fsWatchOptions = {}) ->
+  constructor:(@filename, @separator='\n', @frombeginning=false, @fsWatchOptions = {}) ->
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
     @isWatching = false
     stats =  fs.statSync(@filename)
-    @pos = stats.size
     @internalDispatcher.on 'next',=>
       @readBlock()
-
+    if @frombeginning
+      @pos = 0
+      @watchEvent('change')
+    else
+      @pos = stats.size
     @watch()
 
 
