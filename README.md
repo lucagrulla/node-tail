@@ -21,18 +21,23 @@ tail.on("error", function(error) {
 });
 ````
 
-Tail accepts the line separator as second parameter. If nothing is passed it is defaulted to new line '\n'.
+Tail constructor accepts few parameters:
 
 ```javascript
 
-var lineSeparator= "-";
+var fileToTail = "/path/to/fileToTail.txt";
+var lineSeparator= "\n";
+var fromBeginning = false;
+var watchOptions = {}; \\ as per node fs.watch documentations
 
-new Tail("fileToTail",lineSeparator)
+new Tail(fileToTail, lineSeparator, fromBeginning, watchoptions)
 ```
+The only mandatory one is the first, i.e. the the file you want to tail; the default values for the other 3 parameters are the one documented  in the previous code snippet.
+
 
 Tail emits two type of events:
 
-* line 
+* line
 ```
 function(data){}
 ```
