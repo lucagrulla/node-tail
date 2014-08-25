@@ -36,7 +36,7 @@ new Tail(fileToTail, lineSeparator, fromBeginning, watchoptions)
 * `fileToTail` is the name (inclusive of the path) of the file to tail
 * `lineSeparator` is the line separator token (default "\n")
 * `fromBeginning` force the tail of the file from the very beginning of it instead of from the first new line that will be appended(default: "\n")
-* `watchOptions` is the full set of options that can be passed to `fs.watch` as per node documentation (defauult: {})
+* `watchOptions` is the full set of options that can be passed to `fs.watch` as per node documentation (default: {})
 
 The only mandatory one is the first, i.e. the the file you want to tail.
 
