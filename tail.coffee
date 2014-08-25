@@ -29,11 +29,7 @@ class Tail extends events.EventEmitter
     stats =  fs.statSync(@filename)
     @internalDispatcher.on 'next',=>
       @readBlock()
-    if @frombeginning
-      @pos = 0
-      @watchEvent('change')
-    else
-      @pos = stats.size
+    @pos = if @frombeginning then 0 else stats.size
     @watch()
 
 
