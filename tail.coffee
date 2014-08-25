@@ -21,7 +21,7 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator='\n', @frombeginning=false, @fsWatchOptions = {}) ->
+  constructor:(@filename, @separator='\n', @fsWatchOptions = {}, @frombeginning=false) ->
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
