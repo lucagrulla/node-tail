@@ -1,0 +1,8 @@
+# Ignore unused directories
+/node_modules
+/test
+/.git
+/src
+
+.gitignore
+Cakefile

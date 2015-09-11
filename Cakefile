@@ -1,12 +1,9 @@
 fs = require('fs')
 {exec} = require 'child_process'
-prodCoffeeOpts = " --bare --output release --compile tail.coffee"
+prodCoffeeOpts = " --bare --output lib --compile src/tail.coffee"
 
-task 'build', 'generate release package', (options) ->
-  fs.unlink "release",->
+task 'build', 'generate lib package', (options) ->
+  fs.unlink "lib",->
     exec  "./node_modules/coffee-script/bin/coffee #{prodCoffeeOpts}",(err, stdout, stderr) ->
       throw err if err
-      console.log stdout
-      fs.link "README.md", "release/README.md",
-      fs.link "package.json", "release/package.json",-> 
-        console.log("done.")
+      console.log("done.")

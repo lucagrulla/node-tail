@@ -26,9 +26,9 @@ Tail constructor accepts few parameters:
 ```javascript
 
 var fileToTail = "/path/to/fileToTail.txt";
-var lineSeparator= "\n";
+var lineSeparator= /[\r]{0,1}\n/; // default is now a regex that handle linux/mac (9+)/windows
 var fromBeginning = false;
-var watchOptions = {}; \\ as per node fs.watch documentations
+var watchOptions = {}; // as per node fs.watch documentations
 
 new Tail(fileToTail, lineSeparator, watchOptions,fromBeginning)
 ```
