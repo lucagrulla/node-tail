@@ -50,7 +50,7 @@ class Tail extends events.EventEmitter
         @internalDispatcher.emit("next") if @queue.length is 1
     else if e is 'rename'
       @unwatch()
-      setTimeout (=> @watch()), 1000
+      @emit "error", "File #{@filename} deleted"
 
   watchFileEvent: (curr, prev) ->
     if curr.size > prev.size
