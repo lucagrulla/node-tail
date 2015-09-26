@@ -17,11 +17,12 @@ class Tail extends events.EventEmitter
           @internalDispatcher.emit("next") if @queue.length >= 1
         stream.on 'data', (data) =>
           @buffer += data
+
           parts = @buffer.split(@separator)
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator='\n', @fsWatchOptions = {}, @frombeginning=false) ->
+  constructor:(@filename, @separator=/[\r]{0,1}\n/, @fsWatchOptions = {}, @frombeginning=false) ->
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []

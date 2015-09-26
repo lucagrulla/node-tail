@@ -1,6 +1,10 @@
 {
   "author": "Luca Grulla",
-  "contributors":["Luca Grulla", "Tom Hall", "Andy Kent"],
+  "contributors": [
+    "Luca Grulla",
+    "Tom Hall",
+    "Andy Kent"
+  ],
   "name": "tail",
   "description": "tail a file in node",
   "version": "0.4.0",
@@ -8,11 +12,15 @@
     "type": "git",
     "url": "git://github.com/lucagrulla/node-tail.git"
   },
-  "main": "tail",
+  "main": "lib/tail",
   "engines": {
-    "node":">= 0.4.0"
+    "node": ">= 0.4.0"
   },
   "license": "MIT",
   "dependencies": {},
-  "devDependencies": {"coffee-script":"1.7.1"}
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "coffee-script": "1.7.1",
+    "mocha": "^2.3.2"
+  }
 }
