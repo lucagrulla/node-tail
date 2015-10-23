@@ -8,7 +8,7 @@
   "name": "tail",
   "description": "tail a file in node",
   "version": "0.4.0",
-  "homepage": "http://www.lucagrulla.com/node-tail"
+  "homepage": "http://www.lucagrulla.com/node-tail",
   "repository": {
     "type": "git",
     "url": "git://github.com/lucagrulla/node-tail.git"
