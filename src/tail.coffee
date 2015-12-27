@@ -61,7 +61,6 @@ class Tail extends events.EventEmitter
   unwatch: ->
     if fs.watch && @watcher
       @watcher.close()
-      @pos = 0
     else fs.unwatchFile @filename
     @isWatching = false
     @queue = []
