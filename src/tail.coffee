@@ -1,5 +1,5 @@
-events= require("events")
-fs =require('fs')
+events = require("events")
+fs = require('fs')
 
 environment = process.env['NODE_ENV'] || 'development'
 
@@ -11,7 +11,7 @@ class Tail extends events.EventEmitter
       if block.end > block.start
         stream = fs.createReadStream(@filename, {start:block.start, end:block.end-1, encoding:"utf-8"})
         stream.on 'error',(error) =>
-          console.log("Tail error:#{error}")
+          console.error("Tail error:#{error}")
           @emit('error', error)
         stream.on 'end',=>
           @internalDispatcher.emit("next") if @queue.length >= 1
@@ -22,7 +22,7 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator=/[\r]{0,1}\n/, @fsWatchOptions = {}, @frombeginning=false) ->
+  constructor:(@filename, @separator=/[\r]{0,1}\n/, @fsWatchOptions = {}, @fromBeginning=false) ->
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
@@ -30,7 +30,7 @@ class Tail extends events.EventEmitter
     stats =  fs.statSync(@filename)
     @internalDispatcher.on 'next',=>
       @readBlock()
-    @pos = if @frombeginning then 0 else stats.size
+    @pos = if @fromBeginning then 0 else stats.size
     @watch()
 
 
