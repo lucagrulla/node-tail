@@ -24,7 +24,6 @@ describe 'Tail', ->
 
     tailedFile.on 'line', (line) ->
       expect(line).to.be.equal lineWindowsEnding.replace(/[\r\n]/g, '')
-
       ++nbOfReadLines
 
       if (nbOfReadLines is nbOfLineToWrite)

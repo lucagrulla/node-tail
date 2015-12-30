@@ -27,21 +27,23 @@ class Tail extends events.EventEmitter
     @internalDispatcher = new events.EventEmitter()
     @queue = []
     @isWatching = false
-    stats =  fs.statSync(@filename)
     @internalDispatcher.on 'next',=>
       @readBlock()
-    @pos = if @fromBeginning then 0 else stats.size
-    @watch()
+ 
+    pos = 0 if @fromBeginning
+    @watch(pos)
 
-
-  watch: ->
+  watch: (pos) ->
     return if @isWatching
     @isWatching = true
+    stats =  fs.statSync(@filename)
+    @pos = if pos then pos else stats.size  
+
     if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
     else
       fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
 
-  watchEvent:  (e) ->
+  watchEvent: (e) ->
     if e is 'change'
       stats = fs.statSync(@filename)
       @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
