@@ -39,7 +39,7 @@ class Tail extends events.EventEmitter
     stats =  fs.statSync(@filename)
     @pos = if pos then pos else stats.size  
 
-    if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
+    if fs.watch and process.platform isnt 'win32' then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
     else
       fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
 
