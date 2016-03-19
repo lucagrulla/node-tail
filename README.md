@@ -22,27 +22,22 @@ tail.on("error", function(error) {
   console.log('ERROR: ', error);
 });
 ````
-
-Tail constructor accepts optional parameters passed via a hash:
+The only mandatory parameter is the path to the file to tail. You can pass optional parameters passed via a hash:
 
 ```javascript
-
 var fileToTail = "/path/to/fileToTail.txt";
+new Tail(fileToTail)
+```
+or
 
-var options= {lineSeparator= /[\r]{0,1}\n/, fromBeginning = false, watchOptions = {}, follow = true} //default, equivalent to not passing the hash
+```javascript
+var options= {lineSeparator= /[\r]{0,1}\n/, fromBeginning = false, watchOptions = {}, follow = true} //default value, equivalent to not passing
 new Tail(fileToTail, options)
 ```
 
-//lineSeparator  default is now a regex that handle linux/mac (9+)/windows
-//fromBeginning to control if start tailing
-var lineSeparator= /[\r]{0,1}\n/; // default is now a regex that handle linux/mac (9+)/windows
-var fromBeginning = false;
-var watchOptions = {}; // as per node fs.watch documentations
-
-
 * `fileToTail` is the name (inclusive of the path) of the file to tail
 * `options` is a hash. The following keys are accepted:
-  * `lineSeparator`:  the line separator token (default /[\r]{0,1}\n/ to handle linux/mac (9+)/windows)
+  * `lineSeparator`:  the line separator token (default `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows)
   * `watchOptions`:  the full set of options that can be passed to `fs.watch` as per node documentation (default: {})
   * `fromBeginning`: forces the tail of the file from the very beginning of it instead of from the first new line that will be appended (default: `false`)
   * `follow`: simulate `tail -F` option. In the case the file is moved/renamed (or logrotated) if set to `true` `tail` will try to start tailing again after a 1 second delay, if set to `false` it will just emit an error event (default: `true`)
