@@ -22,11 +22,18 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator=/[\r]{0,1}\n/, @fsWatchOptions = {}, @fromBeginning=false, @follow=true) ->
+  constructor:(@filename, options = {}) ->
+    console.info("Tail starting:")
+    console.info("filename:", @filename)
+    console.info("options:", options)
+
+    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning=false, @follow=true} = options
+
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
     @isWatching = false
+    
     @internalDispatcher.on 'next',=>
       @readBlock()
  

@@ -20,7 +20,7 @@ describe 'Tail', ->
 
     fd = fs.openSync fileToTest, 'w+'
 
-    tailedFile = new Tail fileToTest, null, {}
+    tailedFile = new Tail fileToTest
 
     tailedFile.on 'line', (line) ->
       expect(line).to.be.equal lineWindowsEnding.replace(/[\r\n]/g, '')
@@ -42,7 +42,7 @@ describe 'Tail', ->
 
     fd = fs.openSync fileToTest, 'w+'
 
-    tailedFile = new Tail fileToTest, null, {}
+    tailedFile = new Tail fileToTest
 
     tailedFile.on 'line', (line) ->
       expect(line).to.be.equal lineLinuxEnding.replace(/[\r\n]/g, '')
