@@ -22,7 +22,7 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, @separator=/[\r]{0,1}\n/, @fsWatchOptions = {}, @fromBeginning=false) ->
+  constructor:(@filename, @separator=/[\r]{0,1}\n/, @fsWatchOptions = {}, @fromBeginning=false, @follow=true) ->
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
@@ -53,7 +53,12 @@ class Tail extends events.EventEmitter
         @internalDispatcher.emit("next") if @queue.length is 1
     else if e is 'rename'
       @unwatch()
-      setTimeout (=> @watch()), 1000
+      if @follow
+        setTimeout (=> @watch()), 1000
+      else
+        console.error("'rename' event for #{@filename}. File not available.")
+        @emit("error", "'rename' event for #{@filename}. File not available.")
+      
 
   watchFileEvent: (curr, prev) ->
     if curr.size > prev.size
@@ -66,6 +71,5 @@ class Tail extends events.EventEmitter
     else fs.unwatchFile @filename
     @isWatching = false
     @queue = []
-
 
 exports.Tail = Tail
