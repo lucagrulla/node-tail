@@ -2,12 +2,10 @@
   "author": "Luca Grulla",
   "contributors": [
     "Luca Grulla",
-    "Tom Hall",
-    "Andy Kent"
-  ],
+    "Tom Hall"],
   "name": "tail",
   "description": "tail a file in node",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "homepage": "http://www.lucagrulla.com/node-tail",
   "repository": {
     "type": "git",

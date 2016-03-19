@@ -1,5 +1,7 @@
 #tail
 
+[![NPM](https://nodei.co/npm/tail.png)](https://nodei.co/npm/tail/)
+
 To install:
 
 ```bash
