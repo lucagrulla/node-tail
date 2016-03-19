@@ -1,6 +1,6 @@
 #tail
 
-[![NPM](https://nodei.co/npm/tail.png)](https://nodei.co/npm/tail/)
+[![NPM](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)
 
 To install:
 
