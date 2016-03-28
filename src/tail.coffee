@@ -44,7 +44,7 @@ class Tail extends events.EventEmitter
     return if @isWatching
     @isWatching = true
     stats =  fs.statSync(@filename)
-    @pos = if pos then pos else stats.size  
+    @pos = if pos? then pos else stats.size  
 
     if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
     else

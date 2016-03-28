@@ -1,5 +1,6 @@
 {
-  "author": "Luca Grulla",
+  "author":{"name": "Luca Grulla",
+            "url" : "http://www.lucagrulla.com"},
   "contributors": [
     "Luca Grulla",
     "Tom Hall"],
