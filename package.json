@@ -6,7 +6,7 @@
     "Tom Hall"],
   "name": "tail",
   "description": "tail a file in node",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "homepage": "http://www.lucagrulla.com/node-tail",
   "repository": {
     "type": "git",

@@ -2,13 +2,13 @@
 
 [![NPM](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)
 
-To install:
+# Installation
 
 ```bash
 npm install tail
 ```
 
-#Use:
+# Use:
 ```javascript
 Tail = require('tail').Tail;
 
@@ -21,28 +21,46 @@ tail.on("line", function(data) {
 tail.on("error", function(error) {
   console.log('ERROR: ', error);
 });
-````
-The only mandatory parameter is the path to the file to tail. You can pass optional parameters passed via a hash:
+```
+
+If you want to stop tail:
+
+```javascript
+tail.unwatch()
+```
+
+To start watching again:
+```javascript
+tail.watch()
+```
+
+# Configuration
+The only mandatory parameter is the path to the file to tail. 
 
 ```javascript
 var fileToTail = "/path/to/fileToTail.txt";
 new Tail(fileToTail)
 ```
-or
+
+Optional parameters can be passed via a hash:
 
 ```javascript
-var options= {lineSeparator= /[\r]{0,1}\n/, fromBeginning = false, watchOptions = {}, follow = true} //default value, equivalent to not passing
+var options= {lineSeparator: /[\r]{0,1}\n/, fromBeginning: false, watchOptions: {}, follow: true, logger: console}
 new Tail(fileToTail, options)
 ```
 
-* `fileToTail` is the name (inclusive of the path) of the file to tail
-* `options` is a hash. The following keys are accepted:
-  * `lineSeparator`:  the line separator token (default `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows)
-  * `watchOptions`:  the full set of options that can be passed to `fs.watch` as per node documentation (default: {})
-  * `fromBeginning`: forces the tail of the file from the very beginning of it instead of from the first new line that will be appended (default: `false`)
-  * `follow`: simulate `tail -F` option. In the case the file is moved/renamed (or logrotated) if set to `true` `tail` will try to start tailing again after a 1 second delay, if set to `false` it will just emit an error event (default: `true`)
+# Available parameters:
 
-Tail emits two type of events:
+* `lineSeparator`:  the line separator token (default `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows)
+* `watchOptions`:  the full set of options that can be passed to `fs.watch` as per node documentation (default: {})
+* `fromBeginning`: forces the tail of the file from the very beginning of it instead of from the first new line that will be appended (default: `false`)
+* `follow`: simulate `tail -F` option. In the case the file is moved/renamed (or logrotated), if set to `true` `tail` will try to start tailing again after a 1 second delay, if set to `false` it will just emit an error event (default: `true`)
+* `logger`: a logger object(default: no logger). The passed logger has to respond to two methods:
+    * `info([data][, ...])`
+    * `error([data][, ...])`
+
+# Emitted events
+`Tail` emits two events:
 
 * line
 ```
@@ -55,18 +73,7 @@ function(data){
 function(exception){}
 ```
 
-If you want to stop the tail:
-
-```javascript
-tail.unwatch()
-```
-
-To start watching again:
-```javascript
-tail.watch()
-```
-
-#Want to fork ?
+# Want to fork?
 
 Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
 

@@ -11,7 +11,7 @@ class Tail extends events.EventEmitter
       if block.end > block.start
         stream = fs.createReadStream(@filename, {start:block.start, end:block.end-1, encoding:"utf-8"})
         stream.on 'error',(error) =>
-          console.error("Tail error:#{error}")
+          @logger.error("Tail error:#{error}") if @logger
           @emit('error', error)
         stream.on 'end',=>
           @internalDispatcher.emit("next") if @queue.length >= 1
@@ -23,12 +23,13 @@ class Tail extends events.EventEmitter
           @emit("line", chunk) for chunk in parts
 
   constructor:(@filename, options = {}) ->
-    console.info("Tail starting:")
-    console.info("filename:", @filename)
-    console.info("options:", options)
+    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning=false, @follow=true, @logger } = options
 
-    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning=false, @follow=true} = options
+    if @logger 
+      @logger.info("Tail starting:")
+      @logger.info("filename:", @filename)
 
+    
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
@@ -63,7 +64,7 @@ class Tail extends events.EventEmitter
       if @follow
         setTimeout (=> @watch()), 1000
       else
-        console.error("'rename' event for #{@filename}. File not available.")
+        @logger.error("'rename' event for #{@filename}. File not available.") if @logger
         @emit("error", "'rename' event for #{@filename}. File not available.")
       
 

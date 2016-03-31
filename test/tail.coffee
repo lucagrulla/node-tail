@@ -10,13 +10,6 @@ describe 'Tail', ->
   beforeEach (done) ->
     fs.writeFile fileToTest, '',done
 
-  # before (done) ->
-  #   console.log("a", fs.statSync(fileToTest))
-  #   fs.writeFile fileToTest, '', done
-
-  # after (done) ->
-  #   fs.unlink fileToTest, done
-  
   afterEach (done) ->
     fs.unlink(fileToTest, done) 
 
@@ -73,7 +66,7 @@ describe 'Tail', ->
     readLinesNumber = 0
     readLines = []
 
-    tailedFile = new Tail(fileToTest, {fromBeginning:true})
+    tailedFile = new Tail(fileToTest, {fromBeginning:true, logger: console})
     tailedFile.on 'line', (line) ->
       readLines.push(line)
       if (readLines.length is lines.length) 
