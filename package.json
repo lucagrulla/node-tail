@@ -6,7 +6,7 @@
     "Tom Hall"],
   "name": "tail",
   "description": "tail a file in node",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "homepage": "http://www.lucagrulla.com/node-tail",
   "repository": {
     "type": "git",
@@ -21,6 +21,6 @@
   "devDependencies": {
     "chai": "^3.2.0",
     "coffee-script": "1.10.0",
-    "mocha": "^2.3.2"
+    "mocha": "^3.0.2"
   }
 }

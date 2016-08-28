@@ -45,7 +45,7 @@ describe 'Tail', ->
     readLinesNumber = 0
     readLines = []
 
-    tailedFile = new Tail(fileToTest, {fromBeginning:true, fsWatchOptions: {interval:100}, logger: console})
+    tailedFile = new Tail(fileToTest, {fromBeginning:true, fsWatchOptions: {interval:100}})
     tailedFile.on 'line', (line) ->
       readLines.push(line)
       if (readLines.length is lines.length) 
