@@ -58,6 +58,7 @@ new Tail(fileToTail, options)
 * `logger`: a logger object(default: no logger). The passed logger has to respond to two methods:
     * `info([data][, ...])`
     * `error([data][, ...])`
+* `useWatchFile`: if set to `true` will force the use of `fs.watchFile` rather than delegating to the library the choice between `fs.watch` and `fs.watchFile` (default: `false`)
 
 # Emitted events
 `Tail` emits two events:
