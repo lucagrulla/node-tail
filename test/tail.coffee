@@ -13,52 +13,31 @@ describe 'Tail', ->
   afterEach (done) ->
     fs.unlink(fileToTest, done) 
 
-  it 'should read a file with windows line ending', (done) ->
-    lineWindowsEnding = 'This is a windows line ending\r\n'
-    nbOfLineToWrite = 100
-    nbOfReadLines   = 0
+  lineEndings = [{le:'\r\n', desc: "Windows"}, {le:'\n', desc: "Linux"}]
 
-    fd = fs.openSync fileToTest, 'w+'
+  lineEndings.forEach ({le, desc})->
+    it 'should read a file with ' + desc + ' line ending', ()->
+      text = 'This is a #{desc} line ending#{le}'
+      nbOfLineToWrite = 100
+      nbOfReadLines   = 0
 
-    tailedFile = new Tail fileToTest
+      fd = fs.openSync fileToTest, 'w+'
 
-    tailedFile.on 'line', (line) ->
-      expect(line).to.be.equal lineWindowsEnding.replace(/[\r\n]/g, '')
-      ++nbOfReadLines
+      tailedFile = new Tail fileToTest, {fsWatchOptions: {interval:100}}
 
-      if (nbOfReadLines is nbOfLineToWrite)
-        tailedFile.unwatch()
+      tailedFile.on 'line', (line) ->
+        expect(line).to.be.equal text.replace(/[\r\n]/g, '')
+        ++nbOfReadLines
 
-        done()
+        if (nbOfReadLines is nbOfLineToWrite)
+          tailedFile.unwatch()
 
-    for index in [0..nbOfLineToWrite]
-      fs.writeSync fd, lineWindowsEnding
+          done()
 
-    fs.closeSync fd
+      for index in [0..nbOfLineToWrite]
+        fs.writeSync fd, text
 
-  it 'should read a file with linux line ending', (done) ->
-    lineLinuxEnding   = 'This is a linux line ending\n'
-    nbOfLineToWrite = 100
-    nbOfReadLines   = 0
-
-    fd = fs.openSync fileToTest, 'w+'
-
-    tailedFile = new Tail fileToTest
-
-    tailedFile.on 'line', (line) ->
-      expect(line).to.be.equal lineLinuxEnding.replace(/[\r\n]/g, '')
-
-      ++nbOfReadLines
-
-      if (nbOfReadLines is nbOfLineToWrite)
-        tailedFile.unwatch()
-
-        done()
-
-    for index in [0..nbOfLineToWrite]
-      fs.writeSync fd, lineLinuxEnding
-
-    fs.closeSync fd
+      fs.closeSync fd
 
   it 'should respect fromBeginning flag', (done) ->
     fd = fs.openSync fileToTest, 'w+'
@@ -66,7 +45,7 @@ describe 'Tail', ->
     readLinesNumber = 0
     readLines = []
 
-    tailedFile = new Tail(fileToTest, {fromBeginning:true, logger: console})
+    tailedFile = new Tail(fileToTest, {fromBeginning:true, fsWatchOptions: {interval:100}})
     tailedFile.on 'line', (line) ->
       readLines.push(line)
       if (readLines.length is lines.length) 

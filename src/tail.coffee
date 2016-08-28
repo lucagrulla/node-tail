@@ -4,14 +4,13 @@ fs = require('fs')
 environment = process.env['NODE_ENV'] || 'development'
 
 class Tail extends events.EventEmitter
-
   readBlock:()=>
     if @queue.length >= 1
       block = @queue.shift()
       if block.end > block.start
         stream = fs.createReadStream(@filename, {start:block.start, end:block.end-1, encoding:"utf-8"})
         stream.on 'error',(error) =>
-          @logger.error("Tail error:#{error}") if @logger
+          @logger.error("Tail error: #{error}") if @logger
           @emit('error', error)
         stream.on 'end',=>
           @internalDispatcher.emit("next") if @queue.length >= 1
@@ -23,13 +22,12 @@ class Tail extends events.EventEmitter
           @emit("line", chunk) for chunk in parts
 
   constructor:(@filename, options = {}) ->
-    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning=false, @follow=true, @logger } = options
+    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false, @follow = true, @logger, @useWatchFile = false} = options
 
     if @logger 
-      @logger.info("Tail starting:")
-      @logger.info("filename:", @filename)
+      @logger.info("Tail starting...")
+      @logger.info("filename: #{@filename}")
 
-    
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
     @queue = []
@@ -47,8 +45,15 @@ class Tail extends events.EventEmitter
     stats =  fs.statSync(@filename)
     @pos = if pos? then pos else stats.size  
 
-    if fs.watch then @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
+    if @logger
+      @logger.info("filesystem.watch present? #{fs.watch isnt undefined}")
+      @logger.info("useWatchFile: #{@useWatchFile}")
+
+    if  not @useWatchFile and fs.watch
+      @logger.info("watch strategy: watch") if @logger
+      @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
     else
+      @logger.info("watch strategy: watchFile") if @logger
       fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
 
   watchEvent: (e) ->
@@ -74,9 +79,10 @@ class Tail extends events.EventEmitter
       @internalDispatcher.emit("next") if @queue.length is 1
 
   unwatch: ->
-    if fs.watch && @watcher
+    if @watcher
       @watcher.close()
-    else fs.unwatchFile @filename
+    else 
+      fs.unwatchFile @filename
     @isWatching = false
     @queue = []
 
