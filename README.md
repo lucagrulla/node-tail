@@ -45,7 +45,7 @@ new Tail(fileToTail)
 Optional parameters can be passed via a hash:
 
 ```javascript
-var options= {separator: /[\r]{0,1}\n/, fromBeginning: false, watchOptions: {}, follow: true, logger: console}
+var options= {separator: /[\r]{0,1}\n/, fromBeginning: false, fsWatchOptions: {}, follow: true, logger: console}
 new Tail(fileToTail, options)
 ```
 
