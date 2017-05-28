@@ -13,6 +13,7 @@ class Tail extends events.EventEmitter
           @logger.error("Tail error: #{error}") if @logger
           @emit('error', error)
         stream.on 'end',=>
+          @emit("historicalDataEnd", block.end) if block.isHistorical
           @internalDispatcher.emit("next") if @queue.length >= 1
         stream.on 'data', (data) =>
           @buffer += data
@@ -50,7 +51,7 @@ class Tail extends events.EventEmitter
     @pos = stats.size
 
     if stats.size > pos
-      @queue.push({start: pos, end: stats.size})
+      @queue.push({start: pos, end: stats.size, isHistorical: true})
       @internalDispatcher.emit("next") if @queue.length is 1
 
     if @logger

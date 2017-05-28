@@ -74,6 +74,12 @@ function(data){
 ```
 function(exception){}
 ```
+* historicalDataEnd
+```
+function(end){
+  console.log('Historical data size is', end)
+}
+```
 
 # Want to fork?
 
