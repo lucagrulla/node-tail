@@ -8,7 +8,7 @@ class Tail extends events.EventEmitter
     if @queue.length >= 1
       block = @queue.shift()
       if block.end > block.start
-        stream = fs.createReadStream(@filename, {start:block.start, end:block.end-1, encoding:"utf-8"})
+        stream = fs.createReadStream(@filename, {start:block.start, end:block.end-1, encoding: @encoding})
         stream.on 'error',(error) =>
           @logger.error("Tail error: #{error}") if @logger
           @emit('error', error)
@@ -22,11 +22,12 @@ class Tail extends events.EventEmitter
           @emit("line", chunk) for chunk in parts
 
   constructor:(@filename, options = {}) ->
-    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false, @follow = true, @logger, @useWatchFile = false} = options
+    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false, @follow = true, @logger, @useWatchFile = false, @encoding = "utf-8"} = options
 
     if @logger 
       @logger.info("Tail starting...")
       @logger.info("filename: #{@filename}")
+      @logger.info("encoding: #{@encoding}")
 
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()

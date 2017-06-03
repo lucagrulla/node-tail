@@ -23,7 +23,7 @@ describe 'Tail', ->
 
       fd = fs.openSync fileToTest, 'w+'
 
-      tailedFile = new Tail fileToTest, {fsWatchOptions: {interval:100}}
+      tailedFile = new Tail fileToTest, {fsWatchOptions: {interval:100}, logger: console, encoding: "utf-16"}
 
       tailedFile.on 'line', (line) ->
         expect(line).to.be.equal text.replace(/[\r\n]/g, '')

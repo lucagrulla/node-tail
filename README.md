@@ -59,6 +59,7 @@ new Tail(fileToTail, options)
     * `info([data][, ...])`
     * `error([data][, ...])`
 * `useWatchFile`: if set to `true` will force the use of `fs.watchFile` rather than delegating to the library the choice between `fs.watch` and `fs.watchFile` (default: `false`)
+* `encoding`: the encoding of the file to tail (default:`utf-8`)
 
 # Emitted events
 `Tail` emits two events:
