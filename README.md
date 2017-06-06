@@ -62,9 +62,15 @@ new Tail(fileToTail, options)
 * `useWatchFile`: if set to `true` will force the use of `fs.watchFile` rather than delegating to the library the choice between `fs.watch` and `fs.watchFile` (default: `false`)
 
 # Emitted events
-`Tail` emits three events:
+`Tail` emits four events:
 
 * line
+```
+function(data){
+  console.log(data)
+}
+```
+* data
 ```
 function(data){
   console.log(data)
