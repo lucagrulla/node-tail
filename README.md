@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)
 
-Author: Luca Grulla - www.lucagrulla.com[https://www.lucagrulla.com]
+Author: Luca Grulla - [www.lucagrulla.com](https://www.lucagrulla.com)
 
 # Installation
 
