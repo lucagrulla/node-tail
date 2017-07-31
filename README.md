@@ -83,5 +83,9 @@ Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
 
 The Cakefile generates the javascript that is then published to npm.
 
+# Real world use
+
+Tail was born as part of a data firehose. Read about it [here](https://www.lucagrulla.com/posts/building-a-firehose-with-nodejs/).
+
 #License
 MIT. Please see License file for more details.
