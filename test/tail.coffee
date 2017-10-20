@@ -61,3 +61,24 @@ describe 'Tail', ->
       fs.writeSync fd, l+'\n'
 
     fs.closeSync fd
+
+  it 'should send error event on deletion of file while watching', (done)->
+    text = "This is a line\n"
+
+    fd = fs.openSync fileToTest, 'w+'
+
+    tailedFile = new Tail fileToTest, {fsWatchOptions: {interval:100}, logger: console}
+
+    # ensure error gets called when the file is deleted
+    tailedFile.on 'error', (line) ->
+      # recreate file so that `afterEach` can cleanup
+      fd = fs.openSync fileToTest, 'w+'
+      done()
+
+    tailedFile.on 'line', (line) ->
+      # delete the file
+      fs.unlinkSync fileToTest
+
+    fs.writeSync fd, text
+
+    fs.closeSync fd
