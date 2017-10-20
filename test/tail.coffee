@@ -17,7 +17,7 @@ describe 'Tail', ->
 
   lineEndings.forEach ({le, desc})->
     it 'should read a file with ' + desc + ' line ending', (done)->
-      text = 'This is a #{desc} line ending' + le
+      text = "This is a #{desc} line ending#{le}"
       nbOfLineToWrite = 100
       nbOfReadLines   = 0
 
