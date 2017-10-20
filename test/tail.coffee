@@ -16,14 +16,14 @@ describe 'Tail', ->
   lineEndings = [{le:'\r\n', desc: "Windows"}, {le:'\n', desc: "Linux"}]
 
   lineEndings.forEach ({le, desc})->
-    it 'should read a file with ' + desc + ' line ending', ()->
-      text = 'This is a #{desc} line ending#{le}'
+    it 'should read a file with ' + desc + ' line ending', (done)->
+      text = 'This is a #{desc} line ending' + le
       nbOfLineToWrite = 100
       nbOfReadLines   = 0
 
       fd = fs.openSync fileToTest, 'w+'
 
-      tailedFile = new Tail fileToTest, {fsWatchOptions: {interval:100}, logger: console, encoding: "utf-16"}
+      tailedFile = new Tail fileToTest, {fsWatchOptions: {interval:100}, logger: console}
 
       tailedFile.on 'line', (line) ->
         expect(line).to.be.equal text.replace(/[\r\n]/g, '')
