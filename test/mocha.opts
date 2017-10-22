@@ -1,1 +1,1 @@
---compilers mocha --compilers coffee:coffee-script/register
+--compilers mocha --compilers coffee:coffee-script/register --timeout 3000

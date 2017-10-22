@@ -43,7 +43,12 @@ class Tail extends events.EventEmitter
   watch: (pos) ->
     return if @isWatching
     @isWatching = true
-    stats =  fs.statSync(@filename)
+    try
+      stats =  fs.statSync(@filename)
+    catch err
+      @logger.error("watch for #{@filename} failed: #{@err}") if @logger
+      @emit("error", "watch for #{@filename} failed: #{@err}")
+      return
     @pos = if pos? then pos else stats.size  
 
     if @logger
@@ -59,7 +64,12 @@ class Tail extends events.EventEmitter
 
   watchEvent: (e) ->
     if e is 'change'
-      stats = fs.statSync(@filename)
+      try
+        stats = fs.statSync(@filename)
+      catch err
+        @logger.error("'change' event for #{@filename}. #{@err}") if @logger
+        @emit("error", "'change' event for #{@filename}. #{@err}")
+        return
       @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
       if stats.size > @pos
         @queue.push({start: @pos, end: stats.size})
