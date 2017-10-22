@@ -1,14 +1,14 @@
 {
   "author":{"name": "Luca Grulla",
-            "url" : "http://www.lucagrulla.com"},
+            "url" : "https://www.lucagrulla.com"},
   "contributors": [
     "Luca Grulla",
     "Tom Hall"],
   "name": "tail",
   "description": "tail a file in node",
   "keywords": ["tail", "file"],
-  "version": "1.2.2",
-  "homepage": "http://www.lucagrulla.com/node-tail",
+  "version": "1.2.3",
+  "homepage": "https://www.lucagrulla.com/node-tail",
   "repository": {
     "type": "git",
     "url": "git://github.com/lucagrulla/node-tail.git"
