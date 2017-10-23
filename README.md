@@ -87,5 +87,5 @@ The Cakefile generates the javascript that is then published to npm.
 
 Tail was born as part of a data firehose. Read about it [here](https://www.lucagrulla.com/posts/building-a-firehose-with-nodejs/).
 
-#License
+# License
 MIT. Please see License file for more details.
