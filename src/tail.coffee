@@ -21,7 +21,9 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, options = {}) ->
+  constructor:(filename, options = {}) ->
+    super filename, options
+    @filename = filename 
     {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false, @follow = true, @logger, @useWatchFile = false, @encoding = "utf-8"} = options
 
     if @logger 
