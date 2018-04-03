@@ -82,3 +82,32 @@ describe 'Tail', ->
     fs.writeSync fd, text
 
     fs.closeSync fd
+
+  # it 'should tail lines correctly with a high volume file', (done) ->
+  #       fd = fs.openSync fileToTest, 'w+'
+
+  #       lines = 1000000
+
+  #       text = [0..lines].map (c) ->
+  #         return "aaaaaaaa#{c}"
+     
+  #       tailedFile = new Tail fileToTest, {logger: console}
+        
+  #       cnt = 0 
+  #       tailedFile.on 'line', (line) ->
+  #         if line != text[cnt]
+  #           console.log(line, text[cnt])
+  #           done('line is different:#{line} <> #{text[cnt]}')  
+  #         cnt++
+  #         done() if lines == cnt
+
+  #       tailedFile.on 'error', (line) ->
+  #         console.log('error:' + line)
+
+  #       for l, i in text      
+  #         fs.write fd, "#{l}\n", (e, bw, b) ->
+  #           if i == text.length-1 
+  #             console.log("close")   
+  #             fs.closeSync fd 
+
+  #     .timeout(10000)

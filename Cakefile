@@ -4,6 +4,6 @@ prodCoffeeOpts = " --bare --output lib --compile src/tail.coffee"
 
 task 'build', 'generate lib package', (options) ->
   fs.unlink "lib",->
-    exec  "./node_modules/coffee-script/bin/coffee #{prodCoffeeOpts}",(err, stdout, stderr) ->
+    exec  "./node_modules/coffeescript/bin/coffee #{prodCoffeeOpts}",(err, stdout, stderr) ->
       throw err if err
       console.log("done.")

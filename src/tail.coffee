@@ -6,14 +6,15 @@ environment = process.env['NODE_ENV'] || 'development'
 class Tail extends events.EventEmitter
   readBlock:()=>
     if @queue.length >= 1
-      block = @queue.shift()
+      block = @queue[0]
       if block.end > block.start
         stream = fs.createReadStream(@filename, {start:block.start, end:block.end-1, encoding: @encoding})
         stream.on 'error',(error) =>
           @logger.error("Tail error: #{error}") if @logger
           @emit('error', error)
         stream.on 'end',=>
-          @internalDispatcher.emit("next") if @queue.length >= 1
+          x = @queue.shift()
+          @internalDispatcher.emit("next") if @queue.length > 0
         stream.on 'data', (data) =>
           @buffer += data
 
@@ -21,7 +22,9 @@ class Tail extends events.EventEmitter
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
 
-  constructor:(@filename, options = {}) ->
+  constructor:(filename, options = {}) ->
+    super filename, options
+    @filename = filename 
     {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false, @follow = true, @logger, @useWatchFile = false, @encoding = "utf-8"} = options
 
     if @logger 
@@ -76,6 +79,7 @@ class Tail extends events.EventEmitter
         @pos = stats.size
         @internalDispatcher.emit("next") if @queue.length is 1
     else if e is 'rename'
+      # @logger.info("rename event for ", @filename) if @logger    
       @unwatch()
       if @follow
         setTimeout (=> @watch()), 1000
@@ -96,5 +100,6 @@ class Tail extends events.EventEmitter
       fs.unwatchFile @filename
     @isWatching = false
     @queue = []
+    @logger.info("Unwatch ", @filename) if @logger
 
 exports.Tail = Tail
