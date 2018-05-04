@@ -49,8 +49,8 @@ class Tail extends events.EventEmitter
     try
       stats =  fs.statSync(@filename)
     catch err
-      @logger.error("watch for #{@filename} failed: #{@err}") if @logger
-      @emit("error", "watch for #{@filename} failed: #{@err}")
+      @logger.error("watch for #{@filename} failed: #{err}") if @logger
+      @emit("error", "watch for #{@filename} failed: #{err}")
       return
     @pos = if pos? then pos else stats.size  
 
