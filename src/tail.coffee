@@ -13,6 +13,7 @@ class Tail extends events.EventEmitter
           @logger.error("Tail error: #{error}") if @logger
           @emit('error', error)
         stream.on 'end',=>
+          @emit("historicalDataEnd", block.end) if block.isHistorical
           x = @queue.shift()
           @internalDispatcher.emit("next") if @queue.length > 0
         stream.on 'data', (data) =>
@@ -21,11 +22,13 @@ class Tail extends events.EventEmitter
           parts = @buffer.split(@separator)
           @buffer = parts.pop()
           @emit("line", chunk) for chunk in parts
+        stream.on 'data', (data) =>
+          @emit("data", data)
 
   constructor:(filename, options = {}) ->
     super filename, options
     @filename = filename 
-    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false, @follow = true, @logger, @useWatchFile = false, @encoding = "utf-8"} = options
+    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false, @startPos = null, @follow = true, @logger, @useWatchFile = false, @encoding = "utf-8"} = options
 
     if @logger 
       @logger.info("Tail starting...")
@@ -39,8 +42,12 @@ class Tail extends events.EventEmitter
     
     @internalDispatcher.on 'next',=>
       @readBlock()
- 
-    pos = 0 if @fromBeginning
+
+    if @startPos
+      pos = @startPos
+    else if @fromBeginning
+      pos = 0
+
     @watch(pos)
 
   watch: (pos) ->
@@ -52,7 +59,11 @@ class Tail extends events.EventEmitter
       @logger.error("watch for #{@filename} failed: #{@err}") if @logger
       @emit("error", "watch for #{@filename} failed: #{@err}")
       return
-    @pos = if pos? then pos else stats.size  
+    @pos = stats.size
+
+    if stats.size > pos
+      @queue.push({start: pos, end: stats.size, isHistorical: true})
+      @internalDispatcher.emit("next") if @queue.length is 1
 
     if @logger
       @logger.info("filesystem.watch present? #{fs.watch isnt undefined}")
