@@ -17,6 +17,10 @@
   "engines": {
     "node": ">= 0.4.0"
   },
+  "scripts": {
+    "build": "cake build",
+    "prepare": "npm run build"
+  },
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
