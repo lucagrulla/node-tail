@@ -49,8 +49,8 @@ class Tail extends events.EventEmitter
     try
       stats =  fs.statSync(@filename)
     catch err
-      @logger.error("watch for #{@filename} failed: #{@err}") if @logger
-      @emit("error", "watch for #{@filename} failed: #{@err}")
+      @logger.error("watch for #{@filename} failed: #{err}") if @logger
+      @emit("error", "watch for #{@filename} failed: #{err}")
       return
     @pos = if pos? then pos else stats.size  
 
@@ -70,8 +70,8 @@ class Tail extends events.EventEmitter
       try
         stats = fs.statSync(@filename)
       catch err
-        @logger.error("'change' event for #{@filename}. #{@err}") if @logger
-        @emit("error", "'change' event for #{@filename}. #{@err}")
+        @logger.error("'change' event for #{@filename}. #{err}") if @logger
+        @emit("error", "'change' event for #{@filename}. #{err}")
         return
       @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
       if stats.size > @pos
