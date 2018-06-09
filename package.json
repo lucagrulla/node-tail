@@ -1,12 +1,18 @@
 {
-  "author":{"name": "Luca Grulla",
-            "url" : "https://www.lucagrulla.com"},
+  "author": {
+    "name": "Luca Grulla",
+    "url": "https://www.lucagrulla.com"
+  },
   "contributors": [
     "Luca Grulla",
-    "Tom Hall"],
+    "Tom Hall"
+  ],
   "name": "tail",
   "description": "tail a file in node",
-  "keywords": ["tail", "file"],
+  "keywords": [
+    "tail",
+    "file"
+  ],
   "version": "1.2.3",
   "homepage": "https://www.lucagrulla.com/node-tail",
   "repository": {
@@ -21,7 +27,7 @@
   "dependencies": {},
   "devDependencies": {
     "chai": "^3.2.0",
-    "coffeescript": "2.2.4",
+    "coffeescript": "2.3.1",
     "mocha": "^3.0.2"
   }
 }
