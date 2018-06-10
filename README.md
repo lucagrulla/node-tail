@@ -47,7 +47,7 @@ new Tail(fileToTail)
 Optional parameters can be passed via a hash:
 
 ```javascript
-var options= {separator: /[\r]{0,1}\n/, fromBeginning: false, fsWatchOptions: {}, follow: true, logger: console}
+var options= {separator: /[\r]{0,1}\n/, fromBeginning: false, startPos: 50, fsWatchOptions: {}, follow: true, logger: console}
 new Tail(fileToTail, options)
 ```
 
@@ -56,6 +56,7 @@ new Tail(fileToTail, options)
 * `separator`:  the line separator token (default `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows)
 * `fsWatchOptions`:  the full set of options that can be passed to `fs.watch` as per node documentation (default: {})
 * `fromBeginning`: forces the tail of the file from the very beginning of it instead of from the first new line that will be appended (default: `false`)
+* `startPos`: forces the tail from certain position, if set — `fromBeginning` param will be ignored. (default: `null`)
 * `follow`: simulate `tail -F` option. In the case the file is moved/renamed (or logrotated), if set to `true` `tail` will try to start tailing again after a 1 second delay, if set to `false` it will just emit an error event (default: `true`)
 * `logger`: a logger object(default: no logger). The passed logger has to respond to two methods:
     * `info([data][, ...])`
@@ -64,9 +65,15 @@ new Tail(fileToTail, options)
 * `encoding`: the encoding of the file to tail (default:`utf-8`)
 
 # Emitted events
-`Tail` emits two events:
+`Tail` emits four events:
 
 * line
+```
+function(data){
+  console.log(data)
+}
+```
+* data
 ```
 function(data){
   console.log(data)
@@ -75,6 +82,12 @@ function(data){
 * error
 ```
 function(exception){}
+```
+* historicalDataEnd
+```
+function(end){
+  console.log('Historical data size is', end)
+}
 ```
 
 # Want to fork?
