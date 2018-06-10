@@ -23,6 +23,12 @@
   "engines": {
     "node": ">= 0.4.0"
   },
+  "scripts": {
+    "build": "cake build",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run test",
+    "test": "mocha"
+  },
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
