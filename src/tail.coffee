@@ -24,10 +24,11 @@ class Tail extends events.EventEmitter
 
   constructor:(filename, options = {}) ->
     super filename, options
-    @filename = filename 
-    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false, @follow = true, @logger, @useWatchFile = false, @encoding = "utf-8"} = options
+    @filename = filename
+    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false,
+    @follow = true, @logger, @useWatchFile = false, @encoding = "utf-8"} = options
 
-    if @logger 
+    if @logger
       @logger.info("Tail starting...")
       @logger.info("filename: #{@filename}")
       @logger.info("encoding: #{@encoding}")
@@ -36,10 +37,10 @@ class Tail extends events.EventEmitter
     @internalDispatcher = new events.EventEmitter()
     @queue = []
     @isWatching = false
-    
+
     @internalDispatcher.on 'next',=>
       @readBlock()
- 
+
     pos = 0 if @fromBeginning
     @watch(pos)
 
@@ -52,7 +53,7 @@ class Tail extends events.EventEmitter
       @logger.error("watch for #{@filename} failed: #{err}") if @logger
       @emit("error", "watch for #{@filename} failed: #{err}")
       return
-    @pos = if pos? then pos else stats.size  
+    @pos = if pos? then pos else stats.size
 
     if @logger
       @logger.info("filesystem.watch present? #{fs.watch isnt undefined}")
@@ -60,18 +61,18 @@ class Tail extends events.EventEmitter
 
     if  not @useWatchFile and fs.watch
       @logger.info("watch strategy: watch") if @logger
-      @watcher = fs.watch @filename, @fsWatchOptions, (e) => @watchEvent e
+      @watcher = fs.watch @filename, @fsWatchOptions, (e, filename) => @watchEvent e, filename
     else
       @logger.info("watch strategy: watchFile") if @logger
       fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
 
-  watchEvent: (e) ->
+  watchEvent: (e, filename) ->
     if e is 'change'
       try
         stats = fs.statSync(@filename)
       catch err
-        @logger.error("'change' event for #{@filename}. #{err}") if @logger
-        @emit("error", "'change' event for #{@filename}. #{err}")
+        @logger.error("'#{e}' event for #{@filename}. #{err}") if @logger
+        @emit("error", "'#{e}' event for #{@filename}. #{err}")
         return
       @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
       if stats.size > @pos
@@ -79,14 +80,23 @@ class Tail extends events.EventEmitter
         @pos = stats.size
         @internalDispatcher.emit("next") if @queue.length is 1
     else if e is 'rename'
-      # @logger.info("rename event for ", @filename) if @logger    
-      @unwatch()
-      if @follow
-        setTimeout (=> @watch()), 1000
+      #MacOS sometimes throws a rename event for no reason.
+      #Different platforms might behave differently.
+      #see https://nodejs.org/api/fs.html#fs_fs_watch_filename_options_listener
+      #filename might not be present.
+      #https://nodejs.org/api/fs.html#fs_filename_argument
+      #Better solution would be check inode but it will require a timeout and
+      # a sync file read.
+      if filename != undefined && filename != @filename
+        @unwatch()
+        if @follow
+          setTimeout (=> @watch()), 1000
+        else
+          @logger.error("'rename' event for #{@filename}. File not available.") if @logger
+          @emit("error", "'rename' event for #{@filename}. File not available.")
       else
-        @logger.error("'rename' event for #{@filename}. File not available.") if @logger
-        @emit("error", "'rename' event for #{@filename}. File not available.")
-      
+        # @logger.info("rename event but same filename")
+
 
   watchFileEvent: (curr, prev) ->
     if curr.size > prev.size
@@ -96,7 +106,7 @@ class Tail extends events.EventEmitter
   unwatch: ->
     if @watcher
       @watcher.close()
-    else 
+    else
       fs.unwatchFile @filename
     @isWatching = false
     @queue = []
