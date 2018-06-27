@@ -2,6 +2,9 @@
 
 [![NPM](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)
 
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/lucagrulla/node-tail/blob/master/LICENSE)
+[![npm](https://img.shields.io/npm/v/tail.svg?style=plastic)](https://www.npmjs.com/package/tail)
+
 Author: Luca Grulla - [www.lucagrulla.com](https://www.lucagrulla.com)
 
 # Installation
