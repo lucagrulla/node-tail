@@ -87,7 +87,7 @@ class Tail extends events.EventEmitter
       #https://nodejs.org/api/fs.html#fs_filename_argument
       #Better solution would be check inode but it will require a timeout and
       # a sync file read.
-      if filename != undefined && filename != @filename
+      if filename is undefined || filename isnt @filename
         @unwatch()
         if @follow
           setTimeout (=> @watch()), 1000
