@@ -1,11 +1,13 @@
 # Tail
 
+The **zero** dependency Node.js module for tailing a file
+
 [![NPM](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)](https://nodei.co/npm/tail.png?downloads=true&downloadRank=true)
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/lucagrulla/node-tail/blob/master/LICENSE)
 [![npm](https://img.shields.io/npm/v/tail.svg?style=plastic)](https://www.npmjs.com/package/tail)
 
-Author: Luca Grulla - [www.lucagrulla.com](https://www.lucagrulla.com)
+Author: [Luca Grulla](https://www.lucagrulla.com) - [www.lucagrulla.com](https://www.lucagrulla.com)
 
 # Installation
 
@@ -86,7 +88,7 @@ Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
 
 The Cakefile generates the javascript that is then published to npm.
 
-# Real world use
+# Why tail was born?
 
 Tail was born as part of a data firehose. Read about it [here](https://www.lucagrulla.com/posts/building-a-firehose-with-nodejs/).
 
