@@ -41,6 +41,46 @@ To start watching again:
 tail.watch()
 ```
 
+## Determining if an entire file has been processed
+This example (in Typescript) shows how to wait for Tail to fully process a log file. 
+```typescript
+    // execResult is a Q.Promise<number> that wraps an execution of an asynchronous tool creating a large logfile
+
+    var logTail = new tail.Tail(logfile, { fromBeginning: true, follow: true, logger: console, useWatchFile: true,
+            fsWatchOptions: { interval: 1009 } });
+
+    logTail.on("line", function(data) {
+        console.log(data);
+    });
+
+    logTail.on("error", function(error) {
+        console.log('ERROR: ', error);
+    });
+
+    // Wait for async task to finish
+    var result = await execResult;
+    // Get final size of log file
+    var size = fs.statSync(logfile).size;
+
+    // Wait for tail to finish
+    do {
+        console.log('Waiting for tail to finish...');
+        await sleep(2089);
+    } while (size > getTailPos(logTail) || getTailQueueLength(logTail) > 0);
+
+    logTail.unwatch();
+```
+This uses two accessors to obtain the pos and queue length from the tail object.
+```typescript
+function getTailPos(t:any) : number {
+    return t.pos;
+}
+
+function getTailQueueLength(t:any) : number {
+    return t.queue.length;
+}
+```
+
 # Configuration
 The only mandatory parameter is the path to the file to tail. 
 
