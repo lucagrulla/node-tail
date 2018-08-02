@@ -100,6 +100,7 @@ class Tail extends events.EventEmitter
 
   watchFileEvent: (curr, prev) ->
     if curr.size > prev.size
+      @pos = curr.size    # Update @pos so that a consumer can determine if entire file has been handled
       @queue.push({start:prev.size, end:curr.size})
       @internalDispatcher.emit("next") if @queue.length is 1
 
