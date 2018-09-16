@@ -19,11 +19,13 @@ class Tail extends events.EventEmitter
             @emit("line", @buffer)
             @buffer = ''
         stream.on 'data', (data) =>
-          @buffer += data
-
-          parts = @buffer.split(@separator)
-          @buffer = parts.pop()
-          @emit("line", chunk) for chunk in parts
+          if @separator is null
+            @emit("line", data)
+          else
+            @buffer += data
+            parts = @buffer.split(@separator)
+            @buffer = parts.pop()
+            @emit("line", chunk) for chunk in parts
 
   constructor:(filename, options = {}) ->
     super filename, options
