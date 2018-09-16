@@ -15,7 +15,7 @@ class Tail extends events.EventEmitter
         stream.on 'end',=>
           x = @queue.shift()
           @internalDispatcher.emit("next") if @queue.length > 0
-          if @flushAtEOF
+          if @flushAtEOF && @buffer.length > 0
             @emit("line", @buffer)
             @buffer = ''
         stream.on 'data', (data) =>
