@@ -15,6 +15,9 @@ class Tail extends events.EventEmitter
         stream.on 'end',=>
           x = @queue.shift()
           @internalDispatcher.emit("next") if @queue.length > 0
+          if @flushAtEOF
+            @emit("line", @buffer)
+            @buffer = ''
         stream.on 'data', (data) =>
           @buffer += data
 
@@ -26,7 +29,7 @@ class Tail extends events.EventEmitter
     super filename, options
     @filename = filename
     {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false,
-    @follow = true, @logger, @useWatchFile = false, @encoding = "utf-8"} = options
+    @follow = true, @logger, @useWatchFile = false, @flushAtEOF = false, @encoding = "utf-8"} = options
 
     if @logger
       @logger.info("Tail starting...")
