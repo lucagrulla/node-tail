@@ -9,13 +9,14 @@ The **zero** dependency Node.js module for tailing a file
 
 Author: [Luca Grulla](https://www.lucagrulla.com) - [www.lucagrulla.com](https://www.lucagrulla.com)
 
-# Installation
+## Installation
 
 ```bash
 npm install tail
 ```
 
-# Use:
+## Use:
+
 ```javascript
 Tail = require('tail').Tail;
 
@@ -37,11 +38,12 @@ tail.unwatch()
 ```
 
 To start watching again:
+
 ```javascript
 tail.watch()
 ```
 
-# Configuration
+## Configuration
 The only mandatory parameter is the path to the file to tail. 
 
 ```javascript
@@ -56,42 +58,47 @@ var options= {separator: /[\r]{0,1}\n/, fromBeginning: false, fsWatchOptions: {}
 new Tail(fileToTail, options)
 ```
 
-# Available parameters:
+## Available parameters
 
-* `separator`:  the line separator token (default `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows). Pass null if your file is binary there's no line separator.
-* `fsWatchOptions`:  the full set of options that can be passed to `fs.watch` as per node documentation (default: {})
-* `fromBeginning`: forces the tail of the file from the very beginning of it instead of from the first new line that will be appended (default: `false`)
-* `follow`: simulate `tail -F` option. In the case the file is moved/renamed (or logrotated), if set to `true` `tail` will try to start tailing again after a 1 second delay, if set to `false` it will just emit an error event (default: `true`)
+* `separator`:  the line separator token (default: `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows). Pass null if your file is binary there's no line separator.
+* `fsWatchOptions`: the full set of options that can be passed to `fs.watch` as per node documentation (default: {}).
+* `fromBeginning`: forces the tail of the file from the very beginning of it instead of from the first new line that will be appended (default: `false`).
+* `follow`: simulate `tail -F` option. In the case the file is moved/renamed (or logrotated), if set to `true` `tail` will try to start tailing again after a 1 second delay, if set to `false` it will just emit an error event (default: `true`).
 * `logger`: a logger object(default: no logger). The passed logger has to respond to two methods:
-    * `info([data][, ...])`
-    * `error([data][, ...])`
-* `useWatchFile`: if set to `true` will force the use of `fs.watchFile` rather than delegating to the library the choice between `fs.watch` and `fs.watchFile` (default: `false`)
-* `encoding`: the encoding of the file to tail (default:`utf-8`)
-* `flushAtEOF`: if you want to force flush of content when end of file is reached even if there's no separator character
+  * `info([data][, ...])`
+  * `error([data][, ...])`
+* `useWatchFile`: if set to `true` will force the use of `fs.watchFile` rather than delegating to the library the choice between `fs.watch` and `fs.watchFile` (default: `false`).
+* `encoding`: the encoding of the file to tail (default:`utf-8`).
+* `flushAtEOF`: set to `true` if you want to force flush of content when end of file is reached. Particularly useful when there's no separator character at the end of the file (default: `false`).
 
-# Emitted events
+## Emitted events
+
 `Tail` emits two events:
 
 * line
-```
+
+```javascript
 function(data){
   console.log(data)
 }
 ```
+
 * error
-```
+
+```javascript
 function(exception){}
 ```
 
-# Want to fork?
+## How to contribute
 
 Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
 
 The Cakefile generates the javascript that is then published to npm.
 
-# Why tail was born?
+## History
 
 Tail was born as part of a data firehose. Read about it [here](https://www.lucagrulla.com/posts/building-a-firehose-with-nodejs/).
 
-# License
+## License
+
 MIT. Please see License file for more details.
