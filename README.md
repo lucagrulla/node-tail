@@ -15,7 +15,7 @@ Author: [Luca Grulla](https://www.lucagrulla.com) - [www.lucagrulla.com](https:/
 npm install tail
 ```
 
-## Use:
+## Use
 
 ```javascript
 Tail = require('tail').Tail;
@@ -44,7 +44,8 @@ tail.watch()
 ```
 
 ## Configuration
-The only mandatory parameter is the path to the file to tail. 
+
+The only mandatory parameter is the path to the file to tail.
 
 ```javascript
 var fileToTail = "/path/to/fileToTail.txt";
@@ -58,7 +59,7 @@ var options= {separator: /[\r]{0,1}\n/, fromBeginning: false, fsWatchOptions: {}
 new Tail(fileToTail, options)
 ```
 
-## Available parameters
+### Constructor parameters
 
 * `separator`:  the line separator token (default: `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows). Pass null if your file is binary there's no line separator.
 * `fsWatchOptions`: the full set of options that can be passed to `fs.watch` as per node documentation (default: {}).
@@ -86,7 +87,9 @@ function(data){
 * error
 
 ```javascript
-function(exception){}
+function(exception){
+  console.error(exception);
+}
 ```
 
 ## How to contribute
