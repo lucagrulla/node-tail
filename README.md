@@ -104,4 +104,4 @@ Tail was born as part of a data firehose. Read about it [here](https://www.lucag
 
 ## License
 
-MIT. Please see License file for more details.
+MIT. Please see [License](https://github.com/lucagrulla/node-tail/blob/master/LICENSE) file for more details.
