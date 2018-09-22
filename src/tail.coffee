@@ -4,7 +4,7 @@ fs = require('fs')
 environment = process.env['NODE_ENV'] || 'development'
 
 class Tail extends events.EventEmitter
-  readBlock:()=>
+  readBlock: =>
     if @queue.length >= 1
       block = @queue[0]
       if block.end > block.start
@@ -30,7 +30,7 @@ class Tail extends events.EventEmitter
   constructor:(filename, options = {}) ->
     super filename, options
     @filename = filename
-    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, @fromBeginning = false,
+    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, fromBeginning = false,
     @follow = true, @logger, @useWatchFile = false, @flushAtEOF = false, @encoding = "utf-8"} = options
 
     if @logger
@@ -46,11 +46,29 @@ class Tail extends events.EventEmitter
     @internalDispatcher.on 'next',=>
       @readBlock()
 
-    pos = 0 if @fromBeginning
-    @watch(pos)
+    @watch(fromBeginning)
 
-  watch: (pos) ->
+  change: (filename) =>
+      try
+        stats = fs.statSync(filename)
+      catch err
+        @logger.error("'#{e}' event for #{filename}. #{err}") if @logger
+        @emit("error", "'#{e}' event for #{filename}. #{err}")
+        return
+      @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
+      if stats.size > @pos
+        @queue.push({start: @pos, end: stats.size})
+        @pos = stats.size
+        @internalDispatcher.emit("next") if @queue.length is 1
+
+  watch: (fromBeginning) ->
     return if @isWatching
+    
+    if @logger
+      @logger.info("filesystem.watch present? #{fs.watch isnt undefined}")
+      @logger.info("useWatchFile: #{@useWatchFile}")
+      @logger.info("fromBeginning: #{fromBeginning}")
+
     @isWatching = true
     try
       stats =  fs.statSync(@filename)
@@ -58,11 +76,10 @@ class Tail extends events.EventEmitter
       @logger.error("watch for #{@filename} failed: #{err}") if @logger
       @emit("error", "watch for #{@filename} failed: #{err}")
       return
-    @pos = if pos? then pos else stats.size
-
-    if @logger
-      @logger.info("filesystem.watch present? #{fs.watch isnt undefined}")
-      @logger.info("useWatchFile: #{@useWatchFile}")
+    @pos = if fromBeginning then 0 else stats.size
+    
+    if @pos == 0
+      @change(@filename)
 
     if  not @useWatchFile and fs.watch
       @logger.info("watch strategy: watch") if @logger
@@ -71,20 +88,7 @@ class Tail extends events.EventEmitter
       @logger.info("watch strategy: watchFile") if @logger
       fs.watchFile @filename, @fsWatchOptions, (curr, prev) => @watchFileEvent curr, prev
 
-  watchEvent: (e, filename) ->
-    if e is 'change'
-      try
-        stats = fs.statSync(@filename)
-      catch err
-        @logger.error("'#{e}' event for #{@filename}. #{err}") if @logger
-        @emit("error", "'#{e}' event for #{@filename}. #{err}")
-        return
-      @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
-      if stats.size > @pos
-        @queue.push({start: @pos, end: stats.size})
-        @pos = stats.size
-        @internalDispatcher.emit("next") if @queue.length is 1
-    else if e is 'rename'
+  rename: (filename) ->
       #MacOS sometimes throws a rename event for no reason.
       #Different platforms might behave differently.
       #see https://nodejs.org/api/fs.html#fs_fs_watch_filename_options_listener
@@ -102,6 +106,11 @@ class Tail extends events.EventEmitter
       else
         # @logger.info("rename event but same filename")
 
+  watchEvent: (e, evtFilename) ->
+    if e is 'change'
+      @change(@filename)
+    else if e is 'rename'
+      @rename(evtFilename)
 
   watchFileEvent: (curr, prev) ->
     if curr.size > prev.size

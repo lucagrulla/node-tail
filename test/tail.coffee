@@ -110,6 +110,28 @@ describe 'Tail', ->
 
     fs.closeSync fd
 
+  it.only 'should respect fromBeginning from even the first appended line ', (done) ->
+    fd = fs.openSync fileToTest, 'w+'
+    lines = ['line#0', 'line#1']
+    for l in lines
+      fs.writeSync fd, l+'\n'
+
+    fs.closeSync fd
+
+    readLines = []
+    tailedFile = new Tail(fileToTest, {fromBeginning:true, fsWatchOptions: {interval:100}})
+    tailedFile.on 'line', (line) ->
+      readLines.push(line)
+      if (readLines.length is lines.length)
+        match = readLines.reduce((acc, val, idx)->
+          acc and (val is lines[idx])
+        , true)
+
+        if match
+          tailedFile.unwatch()
+          done()
+
+
   it 'should send error event on deletion of file while watching', (done)->
     text = "This is a line\n"
 
@@ -130,7 +152,8 @@ describe 'Tail', ->
     fs.writeSync fd, text
 
     fs.closeSync fd
-
+  
+  
   # it 'should tail lines correctly with a high volume file', (done) ->
   #       fd = fs.openSync fileToTest, 'w+'
 
