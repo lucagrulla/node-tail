@@ -14,7 +14,7 @@
     "file",
     "logs"
   ],
-  "version": "1.4.1",
+  "version": "2.0.0",
   "homepage": "https://www.lucagrulla.com/node-tail",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
   },
   "main": "lib/tail",
   "engines": {
-    "node": ">= 0.4.0"
+    "node": ">= 6.0.0"
   },
   "scripts": {
     "build": "cake build",
