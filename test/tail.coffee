@@ -110,7 +110,7 @@ describe 'Tail', ->
 
     fs.closeSync fd
 
-  it.only 'should respect fromBeginning from even the first appended line ', (done) ->
+  it 'should respect fromBeginning from even the first appended line ', (done) ->
     fd = fs.openSync fileToTest, 'w+'
     lines = ['line#0', 'line#1']
     for l in lines
