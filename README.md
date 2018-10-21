@@ -6,6 +6,7 @@ The **zero** dependency Node.js module for tailing a file
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/lucagrulla/node-tail/blob/master/LICENSE)
 [![npm](https://img.shields.io/npm/v/tail.svg?style=plastic)](https://www.npmjs.com/package/tail)
+![npm](https://img.shields.io/npm/dm/tail.svg)
 
 Author: [Luca Grulla](https://www.lucagrulla.com) - [www.lucagrulla.com](https://www.lucagrulla.com)
 
