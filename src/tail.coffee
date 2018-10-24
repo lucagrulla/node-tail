@@ -30,8 +30,8 @@ class Tail extends events.EventEmitter
   constructor:(filename, options = {}) ->
     super filename, options
     @filename = filename
-    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {}, fromBeginning = false,
-    @follow = true, @logger, @useWatchFile = false, @flushAtEOF = false, @encoding = "utf-8"} = options
+    {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {},
+    @follow = true, @logger, @useWatchFile = false, @flushAtEOF = false, @encoding = "utf-8",fromBeginning = false} = options
 
     if @logger
       @logger.info("Tail starting...")
