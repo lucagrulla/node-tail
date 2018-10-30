@@ -30,6 +30,8 @@ tail.on("line", function(data) {
 tail.on("error", function(error) {
   console.log('ERROR: ', error);
 });
+
+tail.watch();
 ```
 
 If you want to stop tail:
