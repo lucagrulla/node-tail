@@ -2,7 +2,7 @@ title: Node-tail
 description: Nodejs module for tailing a file
 google_analytics: UA-1839356-1
 show_downloads: false
-theme: jekyll-theme-slate
+theme: jekyll-theme-minimal
 url: https://www.lucagrulla.com
 
 gems:
