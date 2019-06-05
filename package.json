@@ -34,7 +34,7 @@
   "dependencies": {},
   "devDependencies": {
     "chai": "3.x",
-    "coffeescript": "2.3.1",
+    "coffeescript": "2.4.1",
     "mocha": "5.x"
   }
 }
