@@ -154,6 +154,14 @@ describe 'Tail', ->
 
     fs.writeSync fd, text
     fs.closeSync fd
+
+  it 'should throw exception if file is missing', (done)->
+    try 
+        new Tail "missingFile.txt", {fsWatchOptions: {interval:100}, logger:console}
+    catch ex
+      expect(ex.code).to.be.equal 'ENOENT'
+      done()
+    
   
   
   # it 'should tail lines correctly with a high volume file', (done) ->

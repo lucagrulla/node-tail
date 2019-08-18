@@ -37,6 +37,11 @@ class Tail extends events.EventEmitter
       @logger.info("Tail starting...")
       @logger.info("filename: #{@filename}")
       @logger.info("encoding: #{@encoding}")
+      try
+        fs.accessSync @filename, fs.constants.F_OK
+      catch err
+        if err.code is 'ENOENT'
+          throw err
 
     @buffer = ''
     @internalDispatcher = new events.EventEmitter()
