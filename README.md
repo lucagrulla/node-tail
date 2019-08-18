@@ -53,6 +53,16 @@ var fileToTail = "/path/to/fileToTail.txt";
 new Tail(fileToTail)
 ```
 
+If the file is **missing or invalid** ```Tail``` constructor will throw an Exception and won't initialize.
+
+```javascript
+try {
+  new Tail('missingFile.txt')
+} catch ex {
+  console.log(ex)
+}
+```
+
 Optional parameters can be passed via a hash:
 
 ```javascript
@@ -80,17 +90,17 @@ new Tail(fileToTail, options)
 * line
 
 ```javascript
-function(data){
-  console.log(data)
-}
+tail.on('line', (data) => {
+  console.log(data)  
+})
 ```
 
 * error
 
 ```javascript
-function(exception){
-  console.error(exception);
-}
+tail.on('error', (err) => {
+  console.log(err)  
+})
 ```
 
 ## How to contribute
