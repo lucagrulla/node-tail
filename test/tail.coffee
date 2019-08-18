@@ -11,7 +11,11 @@ describe 'Tail', ->
     fs.writeFile fileToTest, '',done
 
   afterEach (done) ->
-    fs.unlink(fileToTest, done)
+    fs.access fileToTest, fs.constants.F_OK, (err) => 
+      if !err
+        fs.unlink(fileToTest, done)
+      else 
+        done()
 
   lineEndings = [{le:'\r\n', desc: "Windows"}, {le:'\n', desc: "Linux"}]
 
@@ -137,20 +141,18 @@ describe 'Tail', ->
 
     fd = fs.openSync fileToTest, 'w+'
 
-    tailedFile = new Tail fileToTest, {fsWatchOptions: {interval:100}, logger: console}
+    tailedFile = new Tail fileToTest, {fsWatchOptions: {interval:100}}
 
     # ensure error gets called when the file is deleted
     tailedFile.on 'error', (line) ->
-      # recreate file so that `afterEach` can cleanup
-      fd = fs.openSync fileToTest, 'w+'
       done()
+      tailedFile.unwatch()
 
     tailedFile.on 'line', (line) ->
       # delete the file
       fs.unlinkSync fileToTest
 
     fs.writeSync fd, text
-
     fs.closeSync fd
   
   
