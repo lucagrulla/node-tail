@@ -33,7 +33,7 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "coffeescript": "2.4.1",
+    "coffeescript": "2.5.1",
     "chai": "4.x",
     "mocha": "6.x"
   }
