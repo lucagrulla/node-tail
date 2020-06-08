@@ -105,7 +105,7 @@ tail.on('error', (err) => {
 
 ## How to contribute
 
-Tail is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/).
+Tail is written in [CoffeeScript](https://coffeescript.org/).
 
 The Cakefile generates the javascript that is then published to npm.
 
