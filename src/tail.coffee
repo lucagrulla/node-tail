@@ -1,5 +1,6 @@
 events = require("events")
 fs = require('fs')
+path = require('path')
 
 environment = process.env['NODE_ENV'] || 'development'
 
@@ -30,6 +31,7 @@ class Tail extends events.EventEmitter
   constructor:(filename, options = {}) ->
     super filename, options
     @filename = filename
+    @absPath = path.dirname(@filename);
     {@separator = /[\r]{0,1}\n/,  @fsWatchOptions = {},
     @follow = true, @logger, @useWatchFile = false, @flushAtEOF = false, @encoding = "utf-8",fromBeginning = false} = options
 
@@ -54,17 +56,17 @@ class Tail extends events.EventEmitter
     @watch(fromBeginning)
 
   change: (filename) =>
-      try
-        stats = fs.statSync(filename)
-      catch err
-        @logger.error("change event for #{filename} failed: #{err}") if @logger
-        @emit("error", "change event for #{filename} failed: #{err}")
-        return
-      @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
-      if stats.size > @pos
-        @queue.push({start: @pos, end: stats.size})
-        @pos = stats.size
-        @internalDispatcher.emit("next") if @queue.length is 1
+    try
+      stats = fs.statSync(filename)
+    catch err
+      @logger.error("change event for #{filename} failed: #{err}") if @logger
+      @emit("error", "change event for #{filename} failed: #{err}")
+      return
+    @pos = stats.size if stats.size < @pos #scenario where texts is not appended but it's actually a w+
+    if stats.size > @pos
+      @queue.push({start: @pos, end: stats.size})
+      @pos = stats.size
+      @internalDispatcher.emit("next") if @queue.length is 1
 
   watch: (fromBeginning) ->
     return if @isWatching
@@ -101,9 +103,11 @@ class Tail extends events.EventEmitter
       #https://nodejs.org/api/fs.html#fs_filename_argument
       #Better solution would be check inode but it will require a timeout and
       # a sync file read.
+      @logger.info("rename func: #{filename} | #{@filename}") if @logger
       if filename is undefined || filename isnt @filename
         @unwatch()
         if @follow
+          @filename = path.join(@absPath, filename)
           setTimeout (=> @watch()), 1000
         else
           @logger.error("'rename' event for #{@filename}. File not available.") if @logger
