@@ -183,3 +183,5 @@ describe 'Tail', ->
       fs.closeSync fdNew
     
     setTimeout writeMore, 1500
+    after ->
+      fs.unlinkSync newName
