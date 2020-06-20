@@ -103,12 +103,11 @@ class Tail extends events.EventEmitter
       #https://nodejs.org/api/fs.html#fs_filename_argument
       #Better solution would be check inode but it will require a timeout and
       # a sync file read.
-      @logger.info("rename func: #{filename} | #{@filename}") if @logger
       if filename is undefined || filename isnt @filename
         @unwatch()
         if @follow
           @filename = path.join(@absPath, filename)
-          setTimeout (=> @watch()), 1000
+          @rewatchId = setTimeout (=> @watch()), 1000
         else
           @logger.error("'rename' event for #{@filename}. File not available.") if @logger
           @emit("error", "'rename' event for #{@filename}. File not available.")
@@ -132,6 +131,9 @@ class Tail extends events.EventEmitter
       @watcher.close()
     else
       fs.unwatchFile @filename
+    if @rewatchId
+      clearTimeout(@rewatchId) 
+      @rewatchId = undefined
     @isWatching = false
     @queue = []
     @logger.info("Unwatch ", @filename) if @logger

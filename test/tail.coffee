@@ -170,7 +170,6 @@ describe 'Tail', ->
     tailedFile = new Tail fileToTest, {fsWatchOptions: {interval:100}, logger:console}
 
     tailedFile.on 'line', (l) ->
-      console.log("got:#{l}")
       done()
       tailedFile.unwatch()
 
