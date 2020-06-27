@@ -1,6 +1,6 @@
 let fs = require("fs")
 let path = require("path")
-let Tail = require('../src/tailn').Tail
+let Tail = require('../src/tail').Tail
 let expect = require('chai').expect
 let exec = require("child_process").exec
 const fileToTest = path.join(__dirname, 'example.txt');
