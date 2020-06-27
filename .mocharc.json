@@ -1,0 +1,11 @@
+{
+  "diff": true,
+  "extension": [
+    "js"
+  ],
+  "require": "mocha",
+  "timeout": 3500,
+  "watch-files": [
+    "src/**/*.js",
+    "test/**/*.js"]
+}

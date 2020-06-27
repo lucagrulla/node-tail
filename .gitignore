@@ -1,4 +1,7 @@
 lib
-test/example.txt
+test/example*.txt
 
 node_modules
+coverage
+.nyc_output
+.vscode

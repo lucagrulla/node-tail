@@ -28,13 +28,14 @@
     "build": "cake build",
     "prepare": "npm run build",
     "prepublishOnly": "npm run test",
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "nyc npm run test"
   },
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "coffeescript": "2.5.1",
     "chai": "4.x",
-    "mocha": "7.x"
+    "mocha": "7.x",
+    "nyc": "^15.1.0"
   }
 }
