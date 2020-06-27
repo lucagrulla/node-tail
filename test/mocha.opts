@@ -1,1 +1,0 @@
---require mocha --timeout 3000 "test/**/*.js"

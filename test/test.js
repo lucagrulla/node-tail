@@ -53,7 +53,7 @@ describe('Tail', function () {
 
         let fd = fs.openSync(fileToTest, 'w+');
 
-        let tailedFile = new Tail(fileToTest, { separator: null, fsWatchOptions: { interval: 100 }, logger: console });
+        let tailedFile = new Tail(fileToTest, { separator: null, fsWatchOptions: { interval: 100 } });
 
         tailedFile.on('line', function (line) {
             expect(line).to.be.equal(`${text}${text}`);
@@ -71,7 +71,7 @@ describe('Tail', function () {
         const lines = ['line  0', 'line  1'];
         let readLines = [];
 
-        const tailedFile = new Tail(fileToTest, { fromBeginning: true, fsWatchOptions: { interval: 100 }, logger: console });
+        const tailedFile = new Tail(fileToTest, { fromBeginning: true, fsWatchOptions: { interval: 100 }});
         tailedFile.on('line', function (line) {
             readLines.push(line);
             if (readLines.length == lines.length) {
@@ -138,7 +138,7 @@ describe('Tail', function () {
 
     it('should throw exception if file is missing', function(done) {
         try {
-            new Tail("missingFile.txt", { fsWatchOptions: { interval: 100 }, logger: console });
+            new Tail("missingFile.txt", { fsWatchOptions: { interval: 100 }});
         } catch (ex) {
             expect(ex.code).to.be.equal('ENOENT');
             done();
@@ -149,7 +149,7 @@ describe('Tail', function () {
      this.timeout(5000);
      const text = "This is a line\n";
 
-     let tailedFile = new Tail( fileToTest, { fsWatchOptions: { interval: 100 }, logger: console });
+     let tailedFile = new Tail( fileToTest, { fsWatchOptions: { interval: 100 }});
 
      tailedFile.on('line', function(l) {
        done();
