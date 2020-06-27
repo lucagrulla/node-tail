@@ -4,26 +4,30 @@ let path = require('path')
 
 // const environment = process.env['NODE_ENV'] || 'development'
 
+class devNull {
+    info() { };
+    error() { };
+}
+
 class Tail extends events.EventEmitter {
     constructor(filename, options = {}) {
         super();
-        this.filename = filename
+        this.filename = filename;
         this.absPath = path.dirname(this.filename);
         this.separator = (options.separator !== undefined) ? options.separator : /[\r]{0,1}\n/;// null is a valid param
         this.fsWatchOptions = options.fsWatchOptions || {};
         this.follow = options.follow || true;
-        this.logger = options.logger;
+        this.logger = options.logger || new devNull();
         this.useWatchFile = options.useWatchFile || false;
         this.flushAtEOF = options.flushAtEOF || false;
         this.encoding = options.encoding || `utf-8`;
         const fromBeginning = options.fromBeginning || false;
 
-        if (this.logger != undefined) {
-            this.logger.info(`Tail starting...`)
-            this.logger.info(`filename: ${this.filename}`);
-            this.logger.info(`encoding: ${this.encoding}`);
 
-        }
+        this.logger.info(`Tail starting...`)
+        this.logger.info(`filename: ${this.filename}`);
+        this.logger.info(`encoding: ${this.encoding}`);
+
         try {
             fs.accessSync(this.filename, fs.constants.F_OK);
         } catch (err) {
@@ -50,9 +54,7 @@ class Tail extends events.EventEmitter {
             if (block.end > block.start) {
                 let stream = fs.createReadStream(this.filename, { start: block.start, end: block.end - 1, encoding: this.encoding });
                 stream.on('error', (error) => {
-                    if (this.logger) {
-                        this.logger.error(`Tail error: ${error}`);
-                    }
+                    this.logger.error(`Tail error: ${error}`);
                     this.emit('error', error);
                 });
                 stream.on('end', () => {
@@ -86,9 +88,7 @@ class Tail extends events.EventEmitter {
         try {
             stats = fs.statSync(filename)
         } catch (err) {
-            if (this.logger) {
-                this.logger.error(`change event for ${filename} failed: ${err}`)
-            }
+            this.logger.error(`change event for ${filename} failed: ${err}`)
             this.emit("error", `change event for ${filename} failed: ${err}`)
             return
         }
@@ -108,20 +108,16 @@ class Tail extends events.EventEmitter {
         if (this.isWatching) {
             return
         }
-        if (this.logger) {
-            this.logger.info(`filesystem.watch present? ${fs.watch != undefined}`);
-            this.logger.info(`useWatchFile: ${this.useWatchFile}`);
-            this.logger.info(`fromBeginning: ${fromBeginning}`);
+        this.logger.info(`filesystem.watch present? ${fs.watch != undefined}`);
+        this.logger.info(`useWatchFile: ${this.useWatchFile}`);
+        this.logger.info(`fromBeginning: ${fromBeginning}`);
 
-        }
         this.isWatching = true;
         let stats = undefined;
         try {
             stats = fs.statSync(this.filename);
         } catch (err) {
-            if (this.logger) {
-                this.ogger.error(`watch for ${this.filename} failed: ${err}`);
-            }
+            this.logger.error(`watch for ${this.filename} failed: ${err}`);
             this.emit("error", `watch for ${this.filename} failed: ${err}`);
             return;
         }
@@ -131,16 +127,10 @@ class Tail extends events.EventEmitter {
         }
 
         if (!this.useWatchFile && fs.watch) {
-            if (this.logger) {
-                this.logger.info(`watch strategy: watch`);
-            }
-            this.watcher = fs.watch(this.filename, this.fsWatchOptions, this.watchEvent); 
-            // this.watcher = fs.watch(this.filename, this.fsWatchOptions, (e, filename) => { this.watchEvent(e, filename); });
+            this.logger.info(`watch strategy: watch`);
+            this.watcher = fs.watch(this.filename, this.fsWatchOptions, (e, filename) => { this.watchEvent(e, filename); });
         } else {
-            if (this.logger) {
-                this.logger.info(`watch strategy: watchFile`);
-            }
-            // fs.watchFile(this.filename, this.fsWatchOptions, this.watchFileEvent);            
+            this.logger.info(`watch strategy: watchFile`);
             fs.watchFile(this.filename, this.fsWatchOptions, (curr, prev) => { this.watchFileEvent(curr, prev) });
         }
     }
@@ -158,12 +148,10 @@ class Tail extends events.EventEmitter {
             this.unwatch();
             if (this.follow) {
                 this.filename = path.join(this.absPath, filename);
-                this.rewatchId = setTimeout((() => { this.watch();}), 1000);
+                this.rewatchId = setTimeout((() => { this.watch(); }), 1000);
                 // this.rewatchId = setTimeout(this.watch, 1000);
             } else {
-                if (this.logger) {
-                    this.logger.error(`'rename' event for ${this.filename}. File not available.`);
-                }
+                this.logger.error(`'rename' event for ${this.filename}. File not available.`);
                 this.emit("error", `'rename' event for ${this.filename}. File not available.`);
             }
         } else {

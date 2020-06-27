@@ -136,7 +136,7 @@ describe('Tail', function () {
         fs.closeSync(fd);
     });
 
-    it('should throw exception if file is missing', function (done) {
+    it('should throw exception if file is missing', function(done) {
         try {
             new Tail("missingFile.txt", { fsWatchOptions: { interval: 100 }, logger: console });
         } catch (ex) {
