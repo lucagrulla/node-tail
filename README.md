@@ -105,13 +105,12 @@ tail.on('error', (err) => {
 
 ## How to contribute
 
-Tail is written in [CoffeeScript](https://coffeescript.org/).
-
-The Cakefile generates the javascript that is then published to npm.
+Tail is written in plain ES6.Pull Requests are welcome.
 
 ## History
 
 Tail was born as part of a data firehose. Read about it [here](https://www.lucagrulla.com/posts/building-a-firehose-with-nodejs/).
+Tail original version was written in [CoffeeScript](https://coffeescript.org/). Since 2020 it's pure ES6.
 
 ## License
 

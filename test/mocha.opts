@@ -1,1 +1,0 @@
---require mocha --require coffeescript/register --timeout 3000 "test/**/*.{js,coffee}"

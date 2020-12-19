@@ -25,16 +25,17 @@
     "node": ">= 6.0.0"
   },
   "scripts": {
-    "build": "cake build",
+    "build": "rm ./lib/** && cp src/tail.js ./lib/",
     "prepare": "npm run build",
     "prepublishOnly": "npm run test",
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "nyc npm run test"
   },
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "coffeescript": "2.5.1",
     "chai": "4.x",
-    "mocha": "8.x"
+    "mocha": "8.x",
+    "nyc": "^15.1.0"
   }
 }
