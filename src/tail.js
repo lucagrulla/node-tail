@@ -149,7 +149,6 @@ class Tail extends events.EventEmitter {
             if (this.follow) {
                 this.filename = path.join(this.absPath, filename);
                 this.rewatchId = setTimeout((() => { this.watch(); }), 1000);
-                // this.rewatchId = setTimeout(this.watch, 1000);
             } else {
                 this.logger.error(`'rename' event for ${this.filename}. File not available.`);
                 this.emit("error", `'rename' event for ${this.filename}. File not available.`);
