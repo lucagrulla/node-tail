@@ -2,11 +2,12 @@ let fs = require("fs")
 let path = require("path")
 let Tail = require('../src/tail').Tail
 let expect = require('chai').expect
+let assert = require('chai').assert
 let exec = require("child_process").exec
 const fileToTest = path.join(__dirname, 'example.txt');
 
 describe('Tail', function () {
-    beforeEach(done => {
+    beforeEach(function(done) {
         fs.writeFile(fileToTest, '', done)
     });
 
@@ -169,5 +170,26 @@ describe('Tail', function () {
      after(function() {
          fs.unlinkSync(newName);
      });
+    });
+
+    it('should emit lines in the right order', function(done) {
+        const fd = fs.openSync(fileToTest, 'w+');
+        const linesNo = 250000;
+
+        const tailedFile = new Tail(fileToTest, {fromBeginning: true, fsWatchOptions: { interval: 100 }});
+        let count = 0;
+        tailedFile.on('line', function(l) {
+            assert.equal(l, count);
+            count++;
+            if (count == linesNo) {
+                tailedFile.unwatch();
+                done();
+            }
+        });
+
+        for (let i = 0; i < linesNo; i++) {
+            fs.writeSync(fd,`${i}\n`);
+        }
+        fs.closeSync(fd);
     });
 });
