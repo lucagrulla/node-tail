@@ -84,6 +84,7 @@ class Tail extends events.EventEmitter
       @emit("error", "watch for #{@filename} failed: #{err}")
       return
     @pos = if fromBeginning then 0 else stats.size
+    @emit("watch", @pos)
     
     if @pos == 0
       @change(@filename)
