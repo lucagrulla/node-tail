@@ -1,24 +1,19 @@
 Tail = require('tail').Tail;
 
+tail = new Tail("test.txt");
 
-tail = new Tail("blah.txt",{logger: console}  );
-
+const limit = parseInt(process.argv[2]) || 200000
+console.log("consumer starting...");
 let cnt = 0
 tail.on("line", (data) => {
-  console.log(data);
-  let s = "aaaaaafsdvfsdfdsfsdjkfhdsfdskfhdsfhdsjfhksd" + cnt;
-//  if (data != s) {
-//    console.error("ERROR",data, s )
-//    process.exit(1)
-//   }
+    if (cnt == 0) {
+      console.time(`tail-${limit}`);
+    }
   cnt++  
+  if (cnt == limit) {
+    console.timeEnd(`tail-${limit}`);
+    tail.unwatch();
+    console.log("consumer done.");
+    process.exit(1)
+  }
 });
-
-// setInterval(() => {
-//   if (cnt > 10) {
-//     //tail.unwatch();
-// //    console.log("stopped:");
-//     process.exit()
-//   }
-// }, 100);
-

@@ -1,8 +1,11 @@
-s = Time.now
+#!/usr/bin/env ruby
+
+# s = Time.now
 
 counter = 0
-limit = 200000
-File.open('blah.txt', 'w+') do |f|
+limit = ARGV[0].to_i || 200000
+puts "producer starting..."
+File.open('test.txt', 'w+') do |f|
   while counter < limit
     f.write("aaaaaafsdvfsdfdsfsdjkfhdsfdskfhdsfhdsjfhksd#{counter}\n")
     counter += 1
@@ -10,6 +13,6 @@ File.open('blah.txt', 'w+') do |f|
     #puts counter
   end
 end
-
-e = Time.now
-puts "perf:#{counter} >#{e-s}"
+puts "producer done."
+# e = Time.now
+# puts "perf:#{counter} >#{e-s}"
