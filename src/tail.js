@@ -10,6 +10,7 @@ class devNull {
 };
 
 class Tail extends events.EventEmitter {
+        
     constructor(filename, options = {}) {
         super();
         this.filename = filename;
@@ -45,7 +46,26 @@ class Tail extends events.EventEmitter {
         this.internalDispatcher.on('next', () => {
             this.readBlock();
         });
-        this.watch(fromBeginning);
+
+        this.logger.info(`fromBeginning: ${fromBeginning}`);
+        let startingPos = undefined;
+        if (fromBeginning) {
+            startingPos = 0;
+            //if fromBeginning triggers a check for content to flush the existing file
+            //without waiting for a new appended line
+            this.change(this.filename);
+        } 
+        this.watch(startingPos);
+    }
+
+    latestPosition() {
+        try {
+            return fs.statSync(this.filename).size;
+        } catch (err) {
+            this.logger.error(`size check for ${this.filename} failed: ${err}`);
+            this.emit("error", `size check for ${this.filename} failed: ${err}`);
+            throw err;
+        }
     }
 
     readBlock() {
@@ -84,54 +104,41 @@ class Tail extends events.EventEmitter {
     }
 
     change(filename) {
-        let stats;
-        try {
-            stats = fs.statSync(filename)
-        } catch (err) {
-            this.logger.error(`change event for ${filename} failed: ${err}`)
-            this.emit("error", `change event for ${filename} failed: ${err}`)
-            return
-        }
-        if (stats.size < this.pos) {//scenario where texts is not appended but it's actually a w+
-            this.pos = stats.size
-        }
-        if (stats.size > this.pos) {
-            this.queue.push({ start: this.pos, end: stats.size });
-            this.pos = stats.size
+        let p = this.latestPosition()
+        if (p < this.pos) {//scenario where text is not appended but it's actually a w+
+            this.pos = p
+        } else if (p > this.pos) {
+            this.queue.push({ start: this.pos, end: p});
+            this.pos = p
             if (this.queue.length == 1) {
                 this.internalDispatcher.emit("next");
             }
         }
     }
 
-    watch(fromBeginning) {
+    watch(startingPos) {
         if (this.isWatching) {
             return
         }
         this.logger.info(`filesystem.watch present? ${fs.watch != undefined}`);
         this.logger.info(`useWatchFile: ${this.useWatchFile}`);
-        this.logger.info(`fromBeginning: ${fromBeginning}`);
 
         this.isWatching = true;
-        let stats = undefined;
+        this.pos = (startingPos === undefined) ? this.latestPosition() : startingPos;
+
         try {
-            stats = fs.statSync(this.filename);
+            if (!this.useWatchFile && fs.watch) {
+                this.logger.info(`watch strategy: watch`);
+                this.watcher = fs.watch(this.filename, this.fsWatchOptions, (e, filename) => { this.watchEvent(e, filename); });
+    
+            } else {
+                this.logger.info(`watch strategy: watchFile`);
+                fs.watchFile(this.filename, this.fsWatchOptions, (curr, prev) => { this.watchFileEvent(curr, prev) });
+            }
         } catch (err) {
             this.logger.error(`watch for ${this.filename} failed: ${err}`);
             this.emit("error", `watch for ${this.filename} failed: ${err}`);
-            return;
-        }
-        this.pos = fromBeginning ? 0 : stats.size;
-        if (this.pos === 0) {
-            this.change(this.filename);
-        }
-
-        if (!this.useWatchFile && fs.watch) {
-            this.logger.info(`watch strategy: watch`);
-            this.watcher = fs.watch(this.filename, this.fsWatchOptions, (e, filename) => { this.watchEvent(e, filename); });
-        } else {
-            this.logger.info(`watch strategy: watchFile`);
-            fs.watchFile(this.filename, this.fsWatchOptions, (curr, prev) => { this.watchFileEvent(curr, prev) });
+            return
         }
     }
 
@@ -148,13 +155,15 @@ class Tail extends events.EventEmitter {
             this.unwatch();
             if (this.follow) {
                 this.filename = path.join(this.absPath, filename);
-                this.rewatchId = setTimeout((() => { this.watch(); }), 1000);
+                this.rewatchId = setTimeout((() => { 
+                    this.watch(this.pos); 
+                }), 1000);
             } else {
-                this.logger.error(`'rename' event for ${this.filename}. File not available.`);
-                this.emit("error", `'rename' event for ${this.filename}. File not available.`);
+                this.logger.error(`'rename' event for ${this.filename}. File not available anymore.`);
+                this.emit("error", `'rename' event for ${this.filename}. File not available anymore.`);
             }
         } else {
-            // @logger.info("rename event but same filename")
+            // this.logger.info("rename event but same filename")
         }
     }
 
@@ -187,7 +196,7 @@ class Tail extends events.EventEmitter {
             this.rewatchId = undefined;
         }
         this.isWatching = false;
-        this.queue = [];
+        this.queue = [];// TODO: is this correct behaviour?
         if (this.logger) {
             this.logger.info(`Unwatch ${this.filename}`);
         }

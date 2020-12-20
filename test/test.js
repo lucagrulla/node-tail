@@ -4,6 +4,7 @@ let Tail = require('../src/tail').Tail
 let expect = require('chai').expect
 let assert = require('chai').assert
 let exec = require("child_process").exec
+const os = require("os")
 const fileToTest = path.join(__dirname, 'example.txt');
 
 describe('Tail', function () {
@@ -120,7 +121,7 @@ describe('Tail', function () {
     });
 
     it('should send error event on deletion of file while watching', function (done) {
-        let text = "This is a line\n";
+        // let text = "This is a line\n";
         let fd = fs.openSync(fileToTest, 'w+');
         const tailedFile = new Tail(fileToTest, { fsWatchOptions: { interval: 100 } });
 
@@ -133,7 +134,7 @@ describe('Tail', function () {
             fs.unlinkSync(fileToTest);
         });
 
-        fs.writeSync(fd, text);
+        fs.writeSync(fd, "This is a line\n");
         fs.closeSync(fd);
     });
 
@@ -155,6 +156,7 @@ describe('Tail', function () {
      tailedFile.on('line', function(l) {
        done();
        tailedFile.unwatch();
+       fs.unlinkSync(newName);
      });
 
      const newName = path.join( __dirname, 'example2.txt');
@@ -166,10 +168,6 @@ describe('Tail', function () {
        fs.closeSync( fdNew)
      };
      setTimeout( writeMore, 1500);
-
-     after(function() {
-         fs.unlinkSync(newName);
-     });
     });
 
     it('should emit lines in the right order', function(done) {
@@ -191,5 +189,35 @@ describe('Tail', function () {
             fs.writeSync(fd,`${i}\n`);
         }
         fs.closeSync(fd);
+    });
+
+    it ('should not lose data between rename events', function(done) {
+        this.timeout(10000);
+        const fd = fs.openSync(fileToTest, 'w+');
+        const newName = path.join( __dirname, 'example2.txt');
+
+        const tailedFile = new Tail(fileToTest, {fromBeginning: true, fsWatchOptions: { interval: 100 }});        
+        let readNo=0;
+        tailedFile.on('line', function(l) {
+            assert.equal(l, readNo);
+            readNo++;
+            if (readNo == 30) {
+                fs.closeSync(fd);
+                clearInterval(id);
+                tailedFile.unwatch();
+                fs.unlinkSync(newName);
+                done();
+            }
+        });
+
+        let writeNo=0;
+        let id = setInterval(() => {
+            fs.writeSync(fd, `${writeNo}${os.EOL}`);
+            writeNo++;
+        }, 50);
+
+        setTimeout(() => {
+            exec(`mv ${fileToTest} ${newName}`);
+        }, 250);
     });
 });
