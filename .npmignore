@@ -3,7 +3,9 @@
 /test
 /.git
 /src
-
+/misc
+./github
 .gitignore
-Cakefile
 _config.yml
+README
+.mocharc.json
