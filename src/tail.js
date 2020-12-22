@@ -21,9 +21,9 @@ class Tail extends events.EventEmitter {
         this.logger = options.logger || new devNull();
         this.useWatchFile = options.useWatchFile || false;
         this.flushAtEOF = options.flushAtEOF || false;
-        this.encoding = options.encoding || `utf-8`;
+        this.encoding = options.encoding || 'utf-8';
         const fromBeginning = options.fromBeginning || false;
-
+        this.nLines = options.nLines || undefined;
 
         this.logger.info(`Tail starting...`)
         this.logger.info(`filename: ${this.filename}`);
@@ -48,14 +48,24 @@ class Tail extends events.EventEmitter {
         });
 
         this.logger.info(`fromBeginning: ${fromBeginning}`);
-        let startingPos = undefined;
+        let startingCursor;
         if (fromBeginning) {
-            startingPos = 0;
-            //if fromBeginning triggers a check for content to flush the existing file
-            //without waiting for a new appended line
-            this.change(this.filename);
-        } 
-        this.watch(startingPos);
+            startingCursor = 0;
+        } else if (this.nLines !== undefined) {
+            const data = fs.readFileSync(this.filename, {
+                flag: 'r',
+                encoding:this.encoding
+              });            
+            const tokens = data.split(this.separator);
+            const dropLastToken = (tokens[tokens.length-1] === '') ? 1:0;//if the file end with empty line ignore line NL
+            const match = data.match(new RegExp(`(?:[^\r\n]*[\r]{0,1}\n){${tokens.length - this.nLines - dropLastToken}}`));
+            startingCursor = (match && match.length) ? Buffer.byteLength(match[0], this.encoding) : this.latestPosition();
+        } else {
+            startingCursor = this.latestPosition() ;
+        }
+        if (startingCursor === undefined) throw new Error("Tail can't initialize.");
+        const flush = fromBeginning || (this.nLines != undefined);
+        this.watch(startingCursor, flush);
     }
 
     latestPosition() {
@@ -103,28 +113,28 @@ class Tail extends events.EventEmitter {
         }
     }
 
-    change(filename) {
+    change() {
         let p = this.latestPosition()
-        if (p < this.pos) {//scenario where text is not appended but it's actually a w+
-            this.pos = p
-        } else if (p > this.pos) {
-            this.queue.push({ start: this.pos, end: p});
-            this.pos = p
+        if (p < this.currentCursorPos) {//scenario where text is not appended but it's actually a w+
+            this.currentCursorPos = p
+        } else if (p > this.currentCursorPos) {
+            this.queue.push({ start: this.currentCursorPos, end: p});
+            this.currentCursorPos = p
             if (this.queue.length == 1) {
                 this.internalDispatcher.emit("next");
             }
         }
     }
 
-    watch(startingPos) {
-        if (this.isWatching) {
-            return
-        }
+    watch(startingCursor, flush) {
+        if (this.isWatching) return;
         this.logger.info(`filesystem.watch present? ${fs.watch != undefined}`);
         this.logger.info(`useWatchFile: ${this.useWatchFile}`);
 
         this.isWatching = true;
-        this.pos = (startingPos === undefined) ? this.latestPosition() : startingPos;
+        this.currentCursorPos = startingCursor;
+        //force a file flush is either fromBegining or nLines flags were passed.
+        if (flush) this.change();
 
         try {
             if (!this.useWatchFile && fs.watch) {
@@ -156,7 +166,7 @@ class Tail extends events.EventEmitter {
             if (this.follow) {
                 this.filename = path.join(this.absPath, filename);
                 this.rewatchId = setTimeout((() => { 
-                    this.watch(this.pos); 
+                    this.watch(this.currentCursorPos); 
                 }), 1000);
             } else {
                 this.logger.error(`'rename' event for ${this.filename}. File not available anymore.`);
@@ -169,7 +179,7 @@ class Tail extends events.EventEmitter {
 
     watchEvent(e, evtFilename) {
         if (e === 'change') {
-            this.change(this.filename);
+            this.change();
         } else if (e === 'rename') {
             this.rename(evtFilename);
         }
@@ -177,7 +187,7 @@ class Tail extends events.EventEmitter {
 
     watchFileEvent(curr, prev) {
         if (curr.size > prev.size) {
-            this.pos = curr.size;    //Update this.pos so that a consumer can determine if entire file has been handled
+            this.currentCursorPos = curr.size;    //Update this.currentCursorPos so that a consumer can determine if entire file has been handled
             this.queue.push({ start: prev.size, end: curr.size });
             if (this.queue.length == 1) {
                 this.internalDispatcher.emit("next");

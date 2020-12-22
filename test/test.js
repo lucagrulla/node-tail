@@ -191,7 +191,7 @@ describe('Tail', function () {
         fs.closeSync(fd);
     });
 
-    it ('should not lose data between rename events', function(done) {
+    it('should not lose data between rename events', function(done) {
         this.timeout(10000);
         const fd = fs.openSync(fileToTest, 'w+');
         const newName = path.join( __dirname, 'example2.txt');
@@ -212,7 +212,7 @@ describe('Tail', function () {
 
         let writeNo=0;
         let id = setInterval(() => {
-            fs.writeSync(fd, `${writeNo}${os.EOL}`);
+            fs.writeSync(fd, `${writeNo}\n`);
             writeNo++;
         }, 50);
 
@@ -220,4 +220,50 @@ describe('Tail', function () {
             exec(`mv ${fileToTest} ${newName}`);
         }, 250);
     });
+
+    it('should respect the nLines flag  with newline', function(done) {
+        const fd = fs.openSync(fileToTest, 'w+');
+        let tokens = [1,2,3,4,5,6,7,8,9,10];
+        const input = tokens.reduce((acc,n) =>{ return `${acc}${n}${os.EOL}`},"");
+        fs.writeSync(fd, input);
+
+        const n = 3;
+        const tailedFile = new Tail(fileToTest, {nLines: n, flushAtEOF:true, fsWatchOptions: { interval: 100 }});                
+        let counter = 1;
+        const toBePrinted = tokens.slice(tokens.length-n);
+        tailedFile.on('line', (l) => {
+            assert.equal(parseInt(l), toBePrinted[counter-1]);
+            if (counter == toBePrinted.length) {
+                done();
+                fs.closeSync(fd);
+                tailedFile.unwatch();
+            }
+            counter++;
+        })
+    })
+
+    it('should respect the nLines flag when file', function(done) {
+        const fd = fs.openSync(fileToTest, 'w+');
+        const tokens = [1,2,3,4,5,6,7,8,9,10];
+        const input = tokens.reduce((acc,n,i) => { 
+            let t = (i == tokens.length-1) ? n : `${n}${os.EOL}`;
+            return `${acc}${t}`;
+        },"");
+        fs.writeSync(fd, input);
+
+        const n = 3;
+        let counter = 1;
+        const tailedFile = new Tail(fileToTest, {nLines: n, flushAtEOF:true, fsWatchOptions: { interval: 100 }});   
+        const toBePrinted = tokens.slice(tokens.length-n);
+             
+        tailedFile.on('line', (l) => {
+            assert.equal(parseInt(l), toBePrinted[counter-1]);
+            if (counter == toBePrinted.length) {
+                done();
+                fs.closeSync(fd);
+                tailedFile.unwatch();
+            }
+            counter++;
+        })
+    })
 });
