@@ -1,6 +1,6 @@
 lib
 test/example*.txt
-
+misc/*.txt
 node_modules
 coverage
 .nyc_output
