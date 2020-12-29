@@ -41,6 +41,7 @@ class Tail extends events.EventEmitter {
         this.internalDispatcher = new events.EventEmitter();
         this.queue = [];
         this.isWatching = false;
+        this.pos = 0;
 
         // this.internalDispatcher.on('next',this.readBlock);
         this.internalDispatcher.on('next', () => {

@@ -69,29 +69,37 @@ describe('Tail', function () {
     });
 
     it('should respect fromBeginning flag', function (done) {
+        this.timeout(10000);
         const fd = fs.openSync(fileToTest, 'w+');
-        const lines = ['line  0', 'line  1'];
-        let readLines = [];
-
-        const tailedFile = new Tail(fileToTest, { fromBeginning: true, fsWatchOptions: { interval: 100 }});
-        tailedFile.on('line', function (line) {
-            readLines.push(line);
-            if (readLines.length == lines.length) {
-                let match = readLines.reduce(function (acc, val, idx) {
-                    return acc && (val == lines[idx]);
-                }, true);
-
-                if (match) {
-                    tailedFile.unwatch();
-                    done();
-                }
-            };
-        });
-
+        const lines = ['line  0', 'line  1','line  2','line  3'];
         for (const l of lines) {
-            fs.writeSync(fd, l + '\n')
+            fs.writeSync(fd, l + os.EOL)
         }
         fs.closeSync(fd);
+
+
+        let readLines = [];
+
+        //the additional timeout is required to avoid an odd behaviour where the file will results changed for no reason
+        setTimeout(function() {
+            const tailedFile = new Tail(fileToTest, { fromBeginning: true});
+            tailedFile.on('line', function (line) {
+                readLines.push(line);
+                if (readLines.length == lines.length) {
+                    let match = readLines.reduce(function (acc, val, idx) {
+                        return acc && (val == lines[idx]);
+                    }, true);
+    
+                    if (match) {
+                        tailedFile.unwatch();
+                        done();
+                    }
+                };
+            });
+    
+        },3000);
+
+
     });
 
     it('should respect fromBeginning from even the first appended line', function (done) {
