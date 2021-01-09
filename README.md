@@ -72,16 +72,17 @@ new Tail(fileToTail, options)
 
 ### Constructor parameters
 
-* `separator`:  the line separator token (default: `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows). Pass null if your file is binary there's no line separator.
+* `separator`:  the line separator token (default: `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows). Pass `null` for is binary files with no line separator.
 * `fsWatchOptions`: the full set of options that can be passed to `fs.watch` as per node documentation (default: {}).
-* `fromBeginning`: forces the tail of the file from the very beginning of it instead of from the first new line that will be appended (default: `false`).
-* `follow`: simulate `tail -F` option. In the case the file is moved/renamed (or logrotated), if set to `true` `tail` will try to start tailing again after a 1 second delay, if set to `false` it will just emit an error event (default: `true`).
-* `logger`: a logger object(default: no logger). The passed logger has to respond to two methods:
+* `fromBeginning`:  tail from the beginning of the file (default: `false`). If `fromBeginning` is true `nLines` will be ignored.
+* `follow`: simulate `tail -F` option. In the case the file is moved/renamed/logrotated, if set to `true`  will start tailing again after a 1 second delay; if set to `false` it will  emit an error event (default: `true`).
+* `logger`: a logger object(default: no logger). The passed logger should follow the folliwing signature:
   * `info([data][, ...])`
   * `error([data][, ...])`
-* `useWatchFile`: if set to `true` will force the use of `fs.watchFile` rather than delegating to the library the choice between `fs.watch` and `fs.watchFile` (default: `false`).
-* `encoding`: the encoding of the file to tail (default:`utf-8`).
-* `flushAtEOF`: set to `true` if you want to force flush of content when end of file is reached. Particularly useful when there's no separator character at the end of the file (default: `false`).
+* `nLines`: tail from the last n lines. (default: `undefined`). Ignored if `fromBeginning` is set to `true`. 
+* `useWatchFile`: if set to `true` will force the use of `fs.watchFile` over delegating to the library the choice between `fs.watch` and `fs.watchFile` (default: `false`).
+* `encoding`: the file encoding (default:`utf-8`).
+* `flushAtEOF`: set to `true` to force flush of content when end of file is reached. Useful when there's no separator character at the end of the file (default: `false`).
 
 ## Emitted events
 
@@ -105,12 +106,12 @@ tail.on('error', (err) => {
 
 ## How to contribute
 
-Tail is written in plain ES6.Pull Requests are welcome.
+Tail is written in ES6. Pull Requests are welcome.
 
 ## History
 
 Tail was born as part of a data firehose. Read about it [here](https://www.lucagrulla.com/posts/building-a-firehose-with-nodejs/).
-Tail original version was written in [CoffeeScript](https://coffeescript.org/). Since 2020 it's pure ES6.
+Tail original version was written in [CoffeeScript](https://coffeescript.org/). Since December 2020 it's pure ES6.
 
 ## License
 
