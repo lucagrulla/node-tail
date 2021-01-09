@@ -252,10 +252,11 @@ describe('Tail', function () {
         fs.writeSync(fd, input);
 
         const n = 3;
-        let counter = 1;
+
         const tailedFile = new Tail(fileToTest, {nLines: n, flushAtEOF:true, fsWatchOptions: { interval: 100 }});   
+     
         const toBePrinted = tokens.slice(tokens.length-n);
-             
+        let counter = 1;             
         tailedFile.on('line', (l) => {
             assert.equal(parseInt(l), toBePrinted[counter-1]);
             if (counter == toBePrinted.length) {
