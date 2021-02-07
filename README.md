@@ -8,7 +8,8 @@ The **zero** dependency Node.js module for tailing a file
 [![npm](https://img.shields.io/npm/v/tail.svg?style=plastic)](https://www.npmjs.com/package/tail)
 ![npm](https://img.shields.io/npm/dm/tail.svg)
 
-Author: [Luca Grulla](https://www.lucagrulla.com) - [www.lucagrulla.com](https://www.lucagrulla.com)
+Made with ❤️ by [Luca Grulla](https://www.lucagrulla.com) 
+
 
 ## Installation
 
@@ -105,13 +106,13 @@ tail.on('error', (err) => {
 ```
 
 ## How to contribute
-
+Node Tail code repo is [here](https://github.com/lucagrulla/node-tail/)
 Tail is written in ES6. Pull Requests are welcome.
 
 ## History
 
-Tail was born as part of a data firehose. Read about it [here](https://www.lucagrulla.com/posts/building-a-firehose-with-nodejs/).
-Tail original version was written in [CoffeeScript](https://coffeescript.org/). Since December 2020 it's pure ES6.
+Tail was born as part of a data firehose. Read more about that project [here](https://www.lucagrulla.com/posts/building-a-firehose-with-nodejs/).
+Tail originally was written in [CoffeeScript](https://coffeescript.org/). Since December 2020 it's pure ES6.
 
 ## License
 
