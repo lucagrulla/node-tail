@@ -10,6 +10,8 @@ The **zero** dependency Node.js module for tailing a file
 
 Made with ❤️ by [Luca Grulla](https://www.lucagrulla.com) 
 
+1. TOC
+{:toc}
 
 ## Installation
 
