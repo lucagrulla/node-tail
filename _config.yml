@@ -1,10 +1,12 @@
-title: Node-tail
-description: Nodejs module for tailing a file
+title: Node tail
+description: Your zero depenency NodeJS package for tailing files
 google_analytics: UA-1839356-1
 show_downloads: false
 #theme: jekyll-theme-minimal
 remote_theme: pmarsceill/just-the-docs
 url: https://www.lucagrulla.com
-
-gems:
-  - jekyll-mentions
+aux_links:
+  " Made with ❤️ by Luca Grulla":
+    - "https://www.lucagrulla.com"
+  " Github repo":
+    - "https://github.com/lucagrulla/node-tail"
