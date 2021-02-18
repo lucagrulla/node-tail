@@ -61,7 +61,7 @@ If the file is **missing or invalid** ```Tail``` constructor will throw an Excep
 ```javascript
 try {
   new Tail('missingFile.txt')
-} catch ex {
+} catch (ex) {
   console.log(ex)
 }
 ```
