@@ -75,7 +75,6 @@ class Tail extends events.EventEmitter {
         } catch (err) {
             this.logger.error(`size check for ${this.filename} failed: ${err}`);
             this.emit("error", `size check for ${this.filename} failed: ${err}`);
-            throw err;
         }
     }
 
