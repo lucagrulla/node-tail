@@ -106,6 +106,7 @@ tail.on('error', (err) => {
   console.log(err)  
 })
 ```
+The error emitted is either the underline exception or a descriptive string.
 
 ## How to contribute
 Node Tail code repo is [here](https://github.com/lucagrulla/node-tail/)
