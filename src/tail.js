@@ -10,7 +10,7 @@ class devNull {
 };
 
 class Tail extends events.EventEmitter {
-        
+
     constructor(filename, options = {}) {
         super();
         this.filename = filename;
@@ -55,18 +55,25 @@ class Tail extends events.EventEmitter {
         } else if (this.nLines !== undefined) {
             const data = fs.readFileSync(this.filename, {
                 flag: 'r',
-                encoding:this.encoding
-              });            
+                encoding: this.encoding
+            });
             const tokens = data.split(this.separator);
-            const dropLastToken = (tokens[tokens.length-1] === '') ? 1:0;//if the file end with empty line ignore line NL
+            const dropLastToken = (tokens[tokens.length - 1] === '') ? 1 : 0;//if the file end with empty line ignore line NL
             const match = data.match(new RegExp(`(?:[^\r\n]*[\r]{0,1}\n){${tokens.length - this.nLines - dropLastToken}}`));
             startingCursor = (match && match.length) ? Buffer.byteLength(match[0], this.encoding) : this.latestPosition();
         } else {
-            startingCursor = this.latestPosition() ;
+            startingCursor = this.latestPosition();
         }
         if (startingCursor === undefined) throw new Error("Tail can't initialize.");
         const flush = fromBeginning || (this.nLines != undefined);
-        this.watch(startingCursor, flush);
+        try {
+            this.watch(startingCursor, flush);
+        } catch (err) {
+            this.logger.error(`watch for ${this.filename} failed: ${err}`);
+            this.emit("error", `watch for ${this.filename} failed: ${err}`);
+
+        }
+
     }
 
     latestPosition() {
@@ -119,7 +126,7 @@ class Tail extends events.EventEmitter {
         if (p < this.currentCursorPos) {//scenario where text is not appended but it's actually a w+
             this.currentCursorPos = p
         } else if (p > this.currentCursorPos) {
-            this.queue.push({ start: this.currentCursorPos, end: p});
+            this.queue.push({ start: this.currentCursorPos, end: p });
             this.currentCursorPos = p
             if (this.queue.length == 1) {
                 this.internalDispatcher.emit("next");
@@ -137,19 +144,12 @@ class Tail extends events.EventEmitter {
         //force a file flush is either fromBegining or nLines flags were passed.
         if (flush) this.change();
 
-        try {
-            if (!this.useWatchFile && fs.watch) {
-                this.logger.info(`watch strategy: watch`);
-                this.watcher = fs.watch(this.filename, this.fsWatchOptions, (e, filename) => { this.watchEvent(e, filename); });
-    
-            } else {
-                this.logger.info(`watch strategy: watchFile`);
-                fs.watchFile(this.filename, this.fsWatchOptions, (curr, prev) => { this.watchFileEvent(curr, prev) });
-            }
-        } catch (err) {
-            this.logger.error(`watch for ${this.filename} failed: ${err}`);
-            this.emit("error", `watch for ${this.filename} failed: ${err}`);
-            return
+        if (!this.useWatchFile && fs.watch) {
+            this.logger.info(`watch strategy: watch`);
+            this.watcher = fs.watch(this.filename, this.fsWatchOptions, (e, filename) => { this.watchEvent(e, filename); });
+        } else {
+            this.logger.info(`watch strategy: watchFile`);
+            fs.watchFile(this.filename, this.fsWatchOptions, (curr, prev) => { this.watchFileEvent(curr, prev) });
         }
     }
 
@@ -166,8 +166,13 @@ class Tail extends events.EventEmitter {
             this.unwatch();
             if (this.follow) {
                 this.filename = path.join(this.absPath, filename);
-                this.rewatchId = setTimeout((() => { 
-                    this.watch(this.currentCursorPos); 
+                this.rewatchId = setTimeout((() => {
+                    try {
+                        this.watch(this.currentCursorPos);
+                    } catch (ex) {
+                        this.logger.error(`'rename' event for ${this.filename}. File not available anymore.`);
+                        this.emit("error", ex);
+                    }
                 }), 1000);
             } else {
                 this.logger.error(`'rename' event for ${this.filename}. File not available anymore.`);
