@@ -17,7 +17,7 @@ class Tail extends events.EventEmitter {
         this.absPath = path.dirname(this.filename);
         this.separator = (options.separator !== undefined) ? options.separator : /[\r]{0,1}\n/;// null is a valid param
         this.fsWatchOptions = options.fsWatchOptions || {};
-        this.follow = 'follow' in options ? options.follow : true;
+        this.follow = options['follow'] != undefined ? options['follow'] : true;
         this.logger = options.logger || new devNull();
         this.useWatchFile = options.useWatchFile || false;
         this.flushAtEOF = options.flushAtEOF || false;
@@ -184,10 +184,17 @@ class Tail extends events.EventEmitter {
     }
 
     watchEvent(e, evtFilename) {
-        if (e === 'change') {
-            this.change();
-        } else if (e === 'rename') {
-            this.rename(evtFilename);
+        try {
+            if (e === 'change') {
+                this.change();
+            } else if (e === 'rename') {
+                this.rename(evtFilename);
+            }
+        } catch (err) {
+            this.logger.error(`watchEvent for ${this.filename} failed: ${err}`);
+            this.emit("error", `watchEvent for ${this.filename} failed: ${err}`);
+            // Don't bubble up the error as there is no way to catch it and it
+            // will cause the node process to terminate
         }
     }
 
