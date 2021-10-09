@@ -14,7 +14,7 @@
     "file",
     "logs"
   ],
-  "version": "2.2.3",
+  "version": "2.2.4",
   "homepage": "https://www.lucagrulla.com/node-tail",
   "repository": {
     "type": "git",

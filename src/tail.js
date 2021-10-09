@@ -184,10 +184,15 @@ class Tail extends events.EventEmitter {
     }
 
     watchEvent(e, evtFilename) {
-        if (e === 'change') {
-            this.change();
-        } else if (e === 'rename') {
-            this.rename(evtFilename);
+        try {
+            if (e === 'change') {
+                this.change();
+            } else if (e === 'rename') {
+                this.rename(evtFilename);
+            }
+        } catch (err) {
+            this.logger.error(`watchEvent for ${this.filename} failed: ${err}`);
+            this.emit("error", `watchEvent for ${this.filename} failed: ${err}`);
         }
     }
 
