@@ -58,9 +58,14 @@ class Tail extends events.EventEmitter {
                 encoding: this.encoding
             });
             const tokens = data.split(this.separator);
-            const dropLastToken = (tokens[tokens.length - 1] === '') ? 1 : 0;//if the file end with empty line ignore line NL
-            const match = data.match(new RegExp(`(?:[^\r\n]*[\r]{0,1}\n){${tokens.length - this.nLines - dropLastToken}}`));
-            startingCursor = (match && match.length) ? Buffer.byteLength(match[0], this.encoding) : this.latestPosition();
+            const dropLastToken = (tokens[tokens.length - 1] === '') ? 1 : 0;//if the file ends with empty line ignore line NL
+            if (tokens.length - this.nLines - dropLastToken <= 0) {
+                //nLines is bigger than avaiable tokens: tail from the begin
+                startingCursor = 0;
+            } else {
+                const match = data.match(new RegExp(`(?:[^\r\n]*[\r]{0,1}\n){${tokens.length - this.nLines - dropLastToken}}`));
+                startingCursor = (match && match.length) ? Buffer.byteLength(match[0], this.encoding) : this.latestPosition();
+            }
         } else {
             startingCursor = this.latestPosition();
         }
