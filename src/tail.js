@@ -48,37 +48,127 @@ class Tail extends events.EventEmitter {
             this.readBlock();
         });
 
+        let cursor;
+
         this.logger.info(`fromBeginning: ${fromBeginning}`);
-        let startingCursor;
         if (fromBeginning) {
-            startingCursor = 0;
+            cursor = 0;
+        } else if (this.nLines <= 0) {
+            cursor = 0;
         } else if (this.nLines !== undefined) {
-            const data = fs.readFileSync(this.filename, {
-                flag: 'r',
-                encoding: this.encoding
-            });
-            const tokens = data.split(this.separator);
-            const dropLastToken = (tokens[tokens.length - 1] === '') ? 1 : 0;//if the file ends with empty line ignore line NL
-            if (tokens.length - this.nLines - dropLastToken <= 0) {
-                //nLines is bigger than avaiable tokens: tail from the begin
-                startingCursor = 0;
-            } else {
-                const match = data.match(new RegExp(`(?:[^\r\n]*[\r]{0,1}\n){${tokens.length - this.nLines - dropLastToken}}`));
-                startingCursor = (match && match.length) ? Buffer.byteLength(match[0], this.encoding) : this.latestPosition();
-            }
+            cursor = this.getPositionAtNthLine(this.nLines);
         } else {
-            startingCursor = this.latestPosition();
+            cursor = this.latestPosition();
         }
-        if (startingCursor === undefined) throw new Error("Tail can't initialize.");
+
+        if (cursor === undefined) throw new Error("Tail can't initialize.");
+
         const flush = fromBeginning || (this.nLines != undefined);
         try {
-            this.watch(startingCursor, flush);
+            this.watch(cursor, flush);
         } catch (err) {
             this.logger.error(`watch for ${this.filename} failed: ${err}`);
             this.emit("error", `watch for ${this.filename} failed: ${err}`);
+        }
+    }
 
+    /**
+     * Grabs the index of the last line of text in the format /.*(\n)?/.
+     * Returns null if a full line can not be found.
+     * @param {string} text
+     * @returns {number | null}
+     */
+    getIndexOfLastLine(text) {
+        const endSep = text.match(this.separator)?.at(-1);
+
+        if (!endSep) return null;
+
+        const endSepIndex = text.lastIndexOf(endSep);
+        let lastLine;
+
+        if (text.endsWith(endSep)) {
+            // If the text ends with a separator, look back further to find the next
+            // separator to complete the line
+
+            const trimmed = text.substring(0, endSepIndex);
+            const startSep = trimmed.match(this.separator)?.at(-1);
+
+            // If there isn't another separator, the line isn't complete so
+            // so return null to get more data
+
+            if (!startSep) {
+                return null;
+            }
+
+            const startSepIndex = trimmed.lastIndexOf(startSep);
+
+            // Exclude the starting separator, include the ending separator
+
+            lastLine = text.substring(
+                startSepIndex + startSep.length,
+                endSepIndex + endSep.length
+            );
+        } else {
+            // If the text does not end with a separator, grab everything after
+            // the last separator
+            lastLine = text.substring(endSepIndex + endSep.length);
         }
 
+        return text.lastIndexOf(lastLine);
+    }
+
+    /**
+     * Returns the position of the start of the `nLines`th line from the bottom.
+     * Returns 0 if `nLines` is greater than the total number of lines in the file.
+     * @param {number} nLines
+     * @returns {number}
+     */
+    getPositionAtNthLine(nLines) {
+        const { size } = fs.statSync(this.filename);
+        const fd = fs.openSync(this.filename);
+
+        // Start from the end of the file and work backwards in specific chunks
+        let currentReadPosition = size;
+        const chunkSizeBytes = Math.min(1024, size);
+        const lineBytes = [];
+
+        let remaining = '';
+
+        while (lineBytes.length < nLines) {
+            // Shift the current read position backward to the amount we're about to read
+            currentReadPosition -= chunkSizeBytes;
+
+            // If negative, we've reached the beginning of the file and we should stop and return 0, starting the
+            // stream at the beginning.
+            if (currentReadPosition < 0) {
+                return 0;
+            }
+
+            // Read a chunk of the file and prepend it to the working buffer
+            const buffer = Buffer.alloc(chunkSizeBytes);
+            const bytesRead = fs.readSync(fd, buffer, {
+                length: chunkSizeBytes,
+                offset: 0,
+                position: currentReadPosition
+            });
+
+            remaining = buffer.subarray(0, bytesRead).toString(this.encoding) + remaining;
+
+            let index = this.getIndexOfLastLine(remaining);
+
+            while (index !== null && lineBytes.length < nLines) {
+                const line = remaining.substring(index);
+
+                lineBytes.push(Buffer.byteLength(line));
+                remaining = remaining.substring(0, index);
+
+                index = this.getIndexOfLastLine(remaining);
+            }
+        }
+
+        fs.closeSync(fd);
+
+        return size - lineBytes.reduce((acc, cur) => acc + cur, 0)
     }
 
     latestPosition() {
