@@ -141,7 +141,7 @@ class Tail extends events.EventEmitter {
      */
     getPositionAtNthLine(nLines) {
         const { size } = fs.statSync(this.filename);
-        const fd = fs.openSync(this.filename);
+        const fd = fs.openSync(this.filename, 'r');
 
         // Start from the end of the file and work backwards in specific chunks
         let currentReadPosition = size;
@@ -162,13 +162,17 @@ class Tail extends events.EventEmitter {
 
             // Read a chunk of the file and prepend it to the working buffer
             const buffer = Buffer.alloc(chunkSizeBytes);
-            const bytesRead = fs.readSync(fd, buffer, {
-                length: chunkSizeBytes,
-                offset: 0,
-                position: currentReadPosition
-            });
+            const bytesRead = fs.readSync(fd, buffer,
+                0,                  // position in buffer to write to
+                chunkSizeBytes,     // number of bytes to read
+                currentReadPosition // position in file to read from
+            );
 
-            remaining = buffer.subarray(0, bytesRead).toString(this.encoding) + remaining;
+            // .subarray returns Uint8Array in node versions < 16.x and Buffer
+            // in versions >= 16.x. To support both, allocate a new buffer with
+            // Buffer.from which accepts both types
+            const readArray = buffer.subarray(0, bytesRead);
+            remaining = Buffer.from(readArray).toString(this.encoding) + remaining;
 
             let index = this.getIndexOfLastLine(remaining);
 
