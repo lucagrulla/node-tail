@@ -79,7 +79,23 @@ class Tail extends events.EventEmitter {
      * @returns {number | null}
      */
     getIndexOfLastLine(text) {
-        const endSep = text.match(this.separator)?.at(-1);
+
+        /**
+         * Helper function get the last match as string
+         * @param {string} haystack
+         * @param {string | RegExp} needle
+         * @returns {string | undefined}
+         */
+        const getLastMatch = (haystack, needle) => {
+            const matches = haystack.match(needle);
+            if (matches === null) {
+                return;
+            }
+
+            return matches[matches.length - 1];
+        };
+
+        const endSep = getLastMatch(text, this.separator);
 
         if (!endSep) return null;
 
@@ -91,7 +107,7 @@ class Tail extends events.EventEmitter {
             // separator to complete the line
 
             const trimmed = text.substring(0, endSepIndex);
-            const startSep = trimmed.match(this.separator)?.at(-1);
+            const startSep = getLastMatch(trimmed, this.separator);
 
             // If there isn't another separator, the line isn't complete so
             // so return null to get more data
