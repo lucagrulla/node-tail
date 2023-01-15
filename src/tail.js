@@ -141,12 +141,12 @@ class Tail extends events.EventEmitter {
      */
     getPositionAtNthLine(nLines) {
         const { size } = fs.statSync(this.filename);
-        const fd = fs.openSync(this.filename, 'r');
 
         if (size === 0) {
             return 0;
         }
-
+        
+        const fd = fs.openSync(this.filename, 'r');
         // Start from the end of the file and work backwards in specific chunks
         let currentReadPosition = size;
         const chunkSizeBytes = Math.min(1024, size);
