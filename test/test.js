@@ -230,6 +230,13 @@ describe('Tail', function () {
     });
 
     describe('nLines', () => {
+        it(`should gracefully handle an empty file`, function (done) {
+            const n = 3;
+            const tailedFile = new Tail(fileToTest, { nLines: n, flushAtEOF: true, fsWatchOptions: { interval: 100 } });
+            tailedFile.unwatch();
+            done();
+        });
+
         lineEndings.forEach(({ le, desc }) => {
             it(`should respect nLines when a file with ${desc} line endings ends with a newline`, function (done) {
                 const fd = fs.openSync(fileToTest, 'w+');
@@ -250,7 +257,7 @@ describe('Tail', function () {
                     }
                     counter++;
                 })
-            })
+            });
 
             it(`should respect nLines when afile with ${desc} line endings does not end with newline`, function (done) {
                 const fd = fs.openSync(fileToTest, 'w+');
