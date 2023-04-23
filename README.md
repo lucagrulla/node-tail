@@ -22,7 +22,7 @@ npm install tail
 ## Use
 
 ```javascript
-Tail = require('tail').Tail;
+Tail = require("tail").Tail;
 
 tail = new Tail("fileToTail");
 
@@ -31,7 +31,7 @@ tail.on("line", function(data) {
 });
 
 tail.on("error", function(error) {
-  console.log('ERROR: ', error);
+  console.log("ERROR: ", error);
 });
 ```
 
@@ -60,7 +60,7 @@ If the file is **missing or invalid** ```Tail``` constructor will throw an Excep
 
 ```javascript
 try {
-  new Tail('missingFile.txt')
+  new Tail("missingFile.txt")
 } catch (ex) {
   console.log(ex)
 }
@@ -75,11 +75,11 @@ new Tail(fileToTail, options)
 
 ### Constructor parameters
 
-* `separator`:  the line separator token (default: `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows). Pass `null` for is binary files with no line separator.
-* `fsWatchOptions`: the full set of options that can be passed to `fs.watch` as per node documentation (default: {}).
+* `separator`:  the line separator token (default: `/[\r]{0,1}\n/` to handle linux/mac (9+)/windows). Pass `null` for binary files with no line separator.
+* `fsWatchOptions`: the full set of options that can be passed to `fs.watch` as per node documentation (default: `{}`).
 * `fromBeginning`:  tail from the beginning of the file (default: `false`). If `fromBeginning` is true `nLines` will be ignored.
 * `follow`: simulate `tail -F` option. In the case the file is moved/renamed/logrotated, if set to `true`  will start tailing again after a 1 second delay; if set to `false` it will  emit an error event (default: `true`).
-* `logger`: a logger object(default: no logger). The passed logger should follow the folliwing signature:
+* `logger`: a logger object(default: no logger). The passed logger should follow the following signature:
   * `info([data][, ...])`
   * `error([data][, ...])`
 * `nLines`: tail from the last n lines. (default: `undefined`). Ignored if `fromBeginning` is set to `true`. 
@@ -94,7 +94,7 @@ new Tail(fileToTail, options)
 * line
 
 ```javascript
-tail.on('line', (data) => {
+tail.on("line", (data) => {
   console.log(data)  
 })
 ```
@@ -102,11 +102,11 @@ tail.on('line', (data) => {
 * error
 
 ```javascript
-tail.on('error', (err) => {
+tail.on("error", (err) => {
   console.log(err)  
 })
 ```
-The error emitted is either the underline exception or a descriptive string.
+The error emitted is either the underlying exception or a descriptive string.
 
 ## How to contribute
 Node Tail code repo is [here](https://github.com/lucagrulla/node-tail/)
