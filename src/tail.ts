@@ -43,7 +43,7 @@ class DevNull {
     error(...args: any) {}
 }
 
-class Tail extends events.EventEmitter {
+export class Tail extends events.EventEmitter {
     private filename: string;
     private absPath: string;
     private separator: string | RegExp;
@@ -132,7 +132,7 @@ class Tail extends events.EventEmitter {
      * @param {string} text
      * @returns {number | null}
      */
-    getIndexOfLastLine(text: string): number | null {
+    private getIndexOfLastLine(text: string): number | null {
         /**
          * Helper function get the last match as string
          * @param {string} haystack
@@ -195,7 +195,7 @@ class Tail extends events.EventEmitter {
      * @param {number} nLines
      * @returns {number}
      */
-    getPositionAtNthLine(nLines: number): number {
+    private getPositionAtNthLine(nLines: number): number {
         const { size } = statSync(this.filename);
 
         if (size === 0) {
@@ -254,7 +254,7 @@ class Tail extends events.EventEmitter {
         return size - lineBytes.reduce((acc, cur) => acc + cur, 0);
     }
 
-    latestPosition() {
+    private latestPosition() {
         try {
             return statSync(this.filename).size;
         } catch (err) {
@@ -267,7 +267,7 @@ class Tail extends events.EventEmitter {
         }
     }
 
-    readBlock() {
+    private readBlock() {
         if (this.queue.length >= 1) {
             const block = this.queue[0];
             if (block!.end > block.start) {
@@ -307,7 +307,7 @@ class Tail extends events.EventEmitter {
         }
     }
 
-    change() {
+    private change() {
         let p = this.latestPosition();
         if (p < this.currentCursorPos) {
             //scenario where text is not appended but it's actually a w+
@@ -350,7 +350,7 @@ class Tail extends events.EventEmitter {
         }
     }
 
-    rename(filename: string) {
+    private rename(filename: string) {
         //TODO
         //MacOS sometimes throws a rename event for no reason.
         //Different platforms might behave differently.
@@ -387,7 +387,7 @@ class Tail extends events.EventEmitter {
         }
     }
 
-    watchEvent(evtName: "change" | "rename", evtFilename: string) {
+    private watchEvent(evtName: "change" | "rename", evtFilename: string) {
         try {
             if (evtName === "change") {
                 this.change();
@@ -403,7 +403,7 @@ class Tail extends events.EventEmitter {
         }
     }
 
-    watchFileEvent(curr: Cursor, prev: Cursor) {
+    private watchFileEvent(curr: Cursor, prev: Cursor) {
         if (curr.size > prev.size) {
             this.currentCursorPos = curr.size; //Update this.currentCursorPos so that a consumer can determine if entire file has been handled
             this.queue.push({ start: prev.size, end: curr.size });
@@ -430,5 +430,3 @@ class Tail extends events.EventEmitter {
         }
     }
 }
-
-exports.Tail = Tail;
