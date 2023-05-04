@@ -1,42 +1,42 @@
 {
-  "author": {
-    "name": "Luca Grulla",
-    "url": "https://www.lucagrulla.com"
-  },
-  "contributors": [
-    "Luca Grulla",
-    "Tom Hall"
-  ],
-  "name": "tail",
-  "description": "tail a file in node",
-  "keywords": [
-    "tail",
-    "file",
-    "logs"
-  ],
-  "version": "2.2.6",
-  "homepage": "https://www.lucagrulla.com/node-tail",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/lucagrulla/node-tail.git"
-  },
-  "main": "lib/tail",
-  "engines": {
-    "node": ">= 6.0.0"
-  },
-  "scripts": {
-    "build": "tsc",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run test",
-    "test": "mocha",
-    "coverage": "nyc npm run test"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^18.16.3",
-    "chai": "4.x",
-    "mocha": "10.x",
-    "nyc": "^15.1.0",
-    "typescript": "^5.0.4"
-  }
+    "author": {
+        "name": "Luca Grulla",
+        "url": "https://www.lucagrulla.com"
+    },
+    "contributors": [
+        "Luca Grulla",
+        "Tom Hall"
+    ],
+    "name": "tail",
+    "description": "tail a file in node",
+    "keywords": [
+        "tail",
+        "file",
+        "logs"
+    ],
+    "version": "2.2.6",
+    "homepage": "https://www.lucagrulla.com/node-tail",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/lucagrulla/node-tail.git"
+    },
+    "main": "lib/tail",
+    "engines": {
+        "node": ">= 6.0.0"
+    },
+    "scripts": {
+        "build": "tsc --declaration",
+        "prepare": "npm run build",
+        "prepublishOnly": "npm run test",
+        "test": "mocha",
+        "coverage": "nyc npm run test"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "^18.16.3",
+        "chai": "4.x",
+        "mocha": "10.x",
+        "nyc": "^15.1.0",
+        "typescript": "^5.0.4"
+    }
 }
