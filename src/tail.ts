@@ -15,11 +15,13 @@ import {
 import { dirname, join } from "path";
 import { EventEmitter } from 'stream';
 
-
+interface FSWatchOptions {
+    interval: number;
+}
 // const environment = process.env['NODE_ENV'] || 'development'
 export interface TailOptions {
-    separator?: string;
-    fsWatchOptions?: null;
+    separator?: string | RegExp | null;
+    fsWatchOptions?: FSWatchOptions;
     follow?: boolean;
     logger?: DevNull;
     useWatchFile?: boolean;
@@ -46,7 +48,7 @@ class DevNull {
 export class Tail extends events.EventEmitter {
     private filename: string;
     private absPath: string;
-    private separator: string | RegExp;
+    private separator?: string | RegExp | null;
     private fsWatchOptions: any;
     private follow: boolean;
     private logger: DevNull;
@@ -141,17 +143,18 @@ export class Tail extends events.EventEmitter {
          */
         const getLastMatch = (
             haystack: string,
-            needle: string | RegExp
+            needle: string | RegExp | null
         ): string | undefined => {
-            const matches = haystack.match(needle);
+            // NOTE `as string` was used to cast the needle to string, but it can be null as well. Just making TS compiler happy
+            const matches = haystack.match(needle as string);
             if (matches === null) {
                 return;
             }
 
             return matches[matches.length - 1];
         };
-
-        const endSep = getLastMatch(text, this.separator);
+        // NOTE `as string` was used to cast the needle to string, but it can be null as well. Just making TS compiler happy
+        const endSep = getLastMatch(text, this.separator as string);
 
         if (!endSep) return null;
 
@@ -163,7 +166,8 @@ export class Tail extends events.EventEmitter {
             // separator to complete the line
 
             const trimmed = text.substring(0, endSepIndex);
-            const startSep = getLastMatch(trimmed, this.separator);
+            // NOTE `as string` was used to cast the needle to string, but it can be null as well. Just making TS compiler happy
+            const startSep = getLastMatch(trimmed, this.separator as string);
 
             // If there isn't another separator, the line isn't complete so
             // so return null to get more data
@@ -295,7 +299,8 @@ export class Tail extends events.EventEmitter {
                         this.emit("line", d);
                     } else {
                         this.buffer += d;
-                        let parts = this.buffer.split(this.separator);
+                        // NOTE `as string` was used to cast the needle to string, but it can be null as well. Just making TS compiler happy
+                        let parts = this.buffer.split(this.separator as string);
                         // NOTE Since parts.pop could return undefined, i'm returning a empty string when that happens
                         this.buffer = parts.pop() ?? "";
                         for (const chunk of parts) {
